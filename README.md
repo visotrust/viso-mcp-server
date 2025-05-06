@@ -1,6 +1,9 @@
-# VISO TRUST MCP Server
+# VISO MCP Server
+
+A Model Context Protocol (MCP) server for integrating VISO Trust API capabilities with AI assistants.
 
 ## Requirements
+
 - Java 21+
 - Gradle
 - MCP Inspector (optional for testing)
