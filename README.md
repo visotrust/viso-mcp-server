@@ -23,7 +23,8 @@ A Model Context Protocol (MCP) server for integrating VISO Trust API capabilitie
                 "localhost"
             ],
             "env": {
-                "JAVA_TOOL_OPTIONS": "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+                "JAVA_TOOL_OPTIONS": "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+                "VISOTRUST_API_TOKEN": "<your-api-token>"
             }
         }
     }
