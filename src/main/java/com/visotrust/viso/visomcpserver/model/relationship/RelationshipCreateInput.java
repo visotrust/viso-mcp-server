@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record RelationshipCreateInput(
-    @Nullable Long id,
     @NotNull String name,
     @Nullable String homepage,
     @Nullable String description,
@@ -16,7 +15,7 @@ public record RelationshipCreateInput(
     @Nullable List<SlimDataTypeView> dataTypes,
     @Nullable String businessOwnerFirstName,
     @Nullable String businessOwnerLastName,
-    @Nullable String businessOwnerEmail,
+    @NotNull String businessOwnerEmail,
     @Nullable List<String> tags,
     @Nullable ThirdPartyContact thirdPartyContact
 ) {}

@@ -39,7 +39,7 @@ public class RelationshipService {
     }
 
     @Tool(name = "create_relationship",
-            description = "Create a new relationship with a third-party vendor. Requires details such as vendor name, homepage, business context, data types, and optionally third-party contact information.")
+            description = "Create a new relationship with a third-party vendor. Requires vendor name, and a Business Owner email, supports optional information such as homepage, business context, data types, and information.")
     public Relationship createRelationship(RelationshipCreateInput request) {
         return apiService.post(RELATIONSHIPS_API_PATH, request, Relationship.class);
     }
