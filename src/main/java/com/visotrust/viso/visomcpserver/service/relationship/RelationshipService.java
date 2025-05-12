@@ -60,7 +60,7 @@ public class RelationshipService {
             description = "Search for relationships by domain name or vendor name. Returns a list of matching relationships with their assessment details.")
     public List<Relationship> searchRelationships(RelationshipSearchInput request) {
         return apiService.post(RELATIONSHIPS_API_PATH + "/search", request,
-                new ParameterizedTypeReference<>() {
+                new ParameterizedTypeReference<List<Relationship>>() {
                 });
     }
 
@@ -68,7 +68,7 @@ public class RelationshipService {
             description = "Create new tags that can be used to categorize and filter relationships. Returns a list of all tags including the newly created ones.")
     public List<String> createTags(TagsCreateInput request) {
         return apiService.post(TAGS_API_PATH, request,
-                new ParameterizedTypeReference<>() {
+                new ParameterizedTypeReference<List<String>>() {
                 });
     }
 
