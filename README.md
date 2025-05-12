@@ -273,3 +273,7 @@ Returns the updated webhook configuration.
 - id: Webhook ID (number, required)
 
 Deletes the specified webhook configuration.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
