@@ -107,6 +107,30 @@ npx @modelcontextprotocol/inspector \
     --port 8080 --host localhost
 ```
 
+### Code Formatting
+
+This project uses [Spotless](https://github.com/diffplug/spotless) with Google Java Format for code formatting. A pre-commit hook is automatically set up to ensure consistent code style.
+
+#### Setup
+
+After cloning the repository, the pre-commit hook will be automatically set up when you run any Gradle command.
+
+#### Manual Formatting
+
+To manually format all files:
+
+```bash
+./gradlew spotlessApply
+```
+
+To check if files are formatted correctly:
+
+```bash
+./gradlew spotlessCheck
+```
+
+If the pre-commit hook rejects your commit due to formatting issues, simply run `./gradlew spotlessApply` to fix the formatting and then try committing again.
+
 ## 🛠️ Tools
 
 This section provides documentation for the tools exposed by the VISO MCP Server. Each tool has a specific purpose, input parameters, and output format.
@@ -273,6 +297,7 @@ Returns the updated webhook configuration.
 - id: Webhook ID (number, required)
 
 Deletes the specified webhook configuration.
+
 
 ## License
 
