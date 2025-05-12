@@ -106,3 +106,170 @@ npx @modelcontextprotocol/inspector \
     java -jar build/libs/viso-mcp-server-1.0.0.jar \
     --port 8080 --host localhost
 ```
+
+## 🛠️ Tools
+
+This section provides documentation for the tools exposed by the VISO MCP Server. Each tool has a specific purpose, input parameters, and output format.
+
+### Assessments
+
+#### `get_assessment` - Get an assessment by its ID
+- id: Assessment ID (number, required)
+
+Returns detailed information about a specific assessment.
+
+#### `create_assessment` - Start an Assessment
+- relationshipId: The ID of the relationship for which to create an assessment (number, required)
+- recipientEmail: The email of the recipient (string, required)
+- recipientFirstName: The first name of the recipient (string, required)
+- recipientLastName: The last name of the recipient (string, required)
+- publicDocumentUrls: URLs of public documents (string[], optional)
+- followupType: The type of followup (string, required)
+- followupRiskThreshold: The risk threshold for followup (string, optional)
+- aiProcessingOnly: Whether to use AI processing only (boolean, optional)
+- files: Files to include with the assessment (byte[][], optional)
+
+Returns the created assessment details.
+
+### Audit Logs
+
+#### `get_user_audit_log_events` - Get the audit log events for your organization
+- request: Audit log request parameters (object, required)
+  - startDate: Start date for the audit log events (string, required)
+  - endDate: End date for the audit log events (string, required)
+  - auditLogType: Type of audit log events to retrieve (string, optional)
+
+Returns a list of user audit log events, limited to 500 records.
+
+### Business Cases
+
+#### `get_all_business_cases` - Get all available business cases for your organization
+No parameters required.
+
+Returns a list of all business cases available for your organization.
+
+### Data Types
+
+#### `get_all_datatypes` - Get all available data types for your organization
+No parameters required.
+
+Returns a list of all data types available for your organization.
+
+### IQR (Intelligent Query Response)
+
+#### `ask_trust_center` - Ask questions about your AI Trust Center
+- request: Trust center query parameters (object, required)
+  - query: The question to ask (string, required)
+
+Returns AI-generated responses to questions about your AI Trust Center.
+
+#### `ask_relationship` - Ask questions about a specific relationship
+- request: Relationship query parameters (object, required)
+  - relationshipId: The ID of the relationship to query (number, required)
+  - query: The question to ask (string, required)
+
+Returns AI-generated responses to questions about a specific relationship.
+
+### Relationships
+
+#### `get_all_relationships` - Get a list of all relationships and their assessment details
+No parameters required.
+
+Returns information about third-party vendors including their assessment status, risk levels, and contact details.
+
+#### `get_relationship_by_id` - Get a specific relationship and its assessment details by ID
+- id: Relationship ID (number, required)
+
+Returns detailed information about a third-party vendor including assessment status, risk levels, and contact details.
+
+#### `create_relationship` - Create a new relationship with a third-party vendor
+- request: Relationship creation parameters (object, required)
+  - vendorName: Name of the vendor (string, required)
+  - businessOwnerEmail: Email of the business owner (string, required)
+  - homepage: Vendor's homepage URL (string, optional)
+  - businessContextIds: IDs of business contexts (number[], optional)
+  - dataTypeIds: IDs of data types (number[], optional)
+  - tags: Tags to apply to the relationship (string[], optional)
+
+Returns the created relationship details.
+
+#### `update_relationship` - Update an existing relationship with a third-party vendor
+- request: Relationship update parameters (object, required)
+  - id: Relationship ID (number, required)
+  - vendorName: Name of the vendor (string, optional)
+  - homepage: Vendor's homepage URL (string, optional)
+  - businessContextIds: IDs of business contexts (number[], optional)
+  - dataTypeIds: IDs of data types (number[], optional)
+  - businessOwnerEmail: Email of the business owner (string, optional)
+  - tags: Tags to apply to the relationship (string[], optional)
+
+Returns the updated relationship details.
+
+#### `partially_update_relationship` - Partially update an existing relationship
+- request: Partial relationship update parameters (object, required)
+  - id: Relationship ID (number, required)
+  - [Any fields from update_relationship that need to be changed]
+
+Returns the updated relationship details with only the specified fields changed.
+
+#### `search_relationships` - Search for relationships by domain name or vendor name
+- request: Search parameters (object, required)
+  - query: Search query (string, required)
+
+Returns a list of matching relationships with their assessment details.
+
+#### `create_tags` - Create new tags for categorizing relationships
+- request: Tag creation parameters (object, required)
+  - tags: List of tags to create (string[], required)
+
+Returns a list of all tags including the newly created ones.
+
+#### `update_third_party_contact` - Update the contact details for a third-party vendor
+- request: Contact update parameters (object, required)
+  - relationshipId: Relationship ID (number, required)
+  - email: Contact email (string, required)
+  - firstName: Contact first name (string, required)
+  - lastName: Contact last name (string, required)
+
+Returns the updated relationship details.
+
+#### `get_suggested_contacts` - Get suggested contacts for a relationship
+- relationshipId: Relationship ID (number, required)
+
+Returns a list of potential contacts at the vendor organization.
+
+### Webhooks
+
+#### `get_all_webhooks` - Get all webhooks
+No parameters required.
+
+Returns a list of all webhook configurations.
+
+#### `get_webhook` - Get a webhook configuration by id
+- id: Webhook ID (number, required)
+
+Returns details of a specific webhook configuration.
+
+#### `create_webhook_configuration` - Create a webhook configuration
+- request: Webhook creation parameters (object, required)
+  - url: Webhook URL (string, required)
+  - secret: Webhook secret (string, required)
+  - eventTypes: Types of events to trigger the webhook (string[], required)
+  - serviceType: Type of service for the webhook (string, required)
+
+Returns the created webhook configuration.
+
+#### `update_webhook_configuration` - Update a webhook configuration
+- request: Webhook update parameters (object, required)
+  - id: Webhook ID (number, required)
+  - url: Webhook URL (string, optional)
+  - secret: Webhook secret (string, optional)
+  - eventTypes: Types of events to trigger the webhook (string[], optional)
+  - serviceType: Type of service for the webhook (string, optional)
+
+Returns the updated webhook configuration.
+
+#### `delete_webhook_configuration` - Delete a webhook configuration
+- id: Webhook ID (number, required)
+
+Deletes the specified webhook configuration.
