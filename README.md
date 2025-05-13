@@ -22,7 +22,119 @@ The following properties can be configured for the VISO TRUST API:
 
 For information on how to generate an API token for the `visotrust.api.token` environment variable, see the [VISO TRUST support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
 
-### Java Configuration
+## Installation
+
+### Quick Install
+Click one of the buttons below to install the VISO MCP Server in VS Code:
+
+<a href="https://insiders.vscode.dev/redirect/mcp/install?name=viso-mcp&inputs=%5B%7B%22id%22%3A%22viso_baseurl%22%2C%22type%22%3A%22promptString%22%2C%22description%22%3A%22VISO%20TRUST%20API%20Base%20URL%22%2C%22default%22%3A%22https%3A%2F%2Fapp.visotrust.com%22%7D%2C%7B%22id%22%3A%22viso_token%22%2C%22type%22%3A%22promptString%22%2C%22description%22%3A%22VISO%20TRUST%20API%20Token%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22-i%22%2C%22--rm%22%2C%22-e%22%2C%22VISOTRUST_API_TOKEN%22%2C%22-e%22%2C%22VISOTRUST_API_BASEURL%22%2C%22viso-mcp-server%22%5D%2C%22env%22%3A%7B%22VISOTRUST_API_BASEURL%22%3A%22%24%7Binput%3Aviso_baseurl%7D%22%2C%22VISOTRUST_API_TOKEN%22%3A%22%24%7Binput%3Aviso_token%7D%22%7D%7D" rel="nofollow"><img src="https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white" alt="Install with Docker in VS Code" style="max-width: 100%;"></a>
+<a href="https://insiders.vscode.dev/redirect/mcp/install?name=viso-mcp&inputs=%5B%7B%22id%22%3A%22viso_baseurl%22%2C%22type%22%3A%22promptString%22%2C%22description%22%3A%22VISO%20TRUST%20API%20Base%20URL%22%2C%22default%22%3A%22https%3A%2F%2Fapp.visotrust.com%22%7D%2C%7B%22id%22%3A%22viso_token%22%2C%22type%22%3A%22promptString%22%2C%22description%22%3A%22VISO%20TRUST%20API%20Token%22%2C%22password%22%3Atrue%7D%5D&config=%7B%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22-i%22%2C%22--rm%22%2C%22-e%22%2C%22VISOTRUST_API_TOKEN%22%2C%22-e%22%2C%22VISOTRUST_API_BASEURL%22%2C%22viso-mcp-server%22%5D%2C%22env%22%3A%7B%22VISOTRUST_API_BASEURL%22%3A%22%24%7Binput%3Aviso_baseurl%7D%22%2C%22VISOTRUST_API_TOKEN%22%3A%22%24%7Binput%3Aviso_token%7D%22%7D%7D&quality=insiders" rel="nofollow"><img src="https://img.shields.io/badge/VS_Code_Insiders-Install_Server-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white" alt="Install with Docker in VS Code Insiders" style="max-width: 100%;"></a>
+
+### Manual Setup with VS Code
+Add the following JSON block to your User Settings (JSON) file in VS Code. You can do this by pressing Ctrl + Shift + P and typing Preferences: Open User Settings (JSON).
+```json
+{
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "viso_baseurl",
+        "description": "VISO TRUST API Base URL",
+        "default": "https://app.visotrust.com"
+      },
+      {
+        "type": "promptString",
+        "id": "viso_token",
+        "description": "VISO TRUST API Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "viso-mcp": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "VISOTRUST_API_TOKEN",
+          "-e",
+          "VISOTRUST_API_BASEURL",
+          "viso-mcp-server"
+        ],
+        "env": {
+          "VISOTRUST_API_BASEURL": "${input:viso_baseurl}",
+          "VISOTRUST_API_TOKEN": "${input:viso_token}"
+        }
+      }
+    }
+  }
+}
+```
+
+Optionally, you can add a similar example (i.e. without the mcp key) to a file called .vscode/mcp.json in your workspace. This will allow you to share the configuration with others.
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "viso_baseurl",
+      "description": "VISO TRUST API Base URL",
+      "default": "https://app.visotrust.com"
+    },
+    {
+      "type": "promptString",
+      "id": "viso_token",
+      "description": "VISO TRUST API Token",
+      "password": true
+    }
+  ],
+  "servers": {
+    "viso-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "VISOTRUST_API_TOKEN",
+        "-e",
+        "VISOTRUST_API_BASEURL",
+        "viso-mcp-server"
+      ],
+      "env": {
+        "VISOTRUST_API_BASEURL": "${input:viso_baseurl}",
+        "VISOTRUST_API_TOKEN": "${input:viso_token}"
+      }
+    }
+  }
+}
+```
+### Usage with Claude Desktop and other MCP Clients
+#### Docker Configuration
+```json
+{
+    "mcpServers": {
+        "viso-mcp": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e", "VISOTRUST_API_TOKEN",
+                "-e", "VISOTRUST_API_BASEURL",
+                "viso-mcp-server"
+            ],
+            "env": {
+                "VISOTRUST_API_TOKEN": "<your-api-token>",
+                "VISOTRUST_API_BASEURL": "https://app.visotrust.com"
+            }
+        }
+    }
+}
+```
+
+#### Java Configuration
 ```json
 {
     "mcpServers": {
@@ -46,29 +158,6 @@ For information on how to generate an API token for the `visotrust.api.token` en
 }
 ```
 Note: The JAVA_TOOL_OPTIONS environment variable is used to set the JVM options for remote debugging. The address and port can be changed as needed.
-
-### Docker Configuration
-```json
-{
-    "mcpServers": {
-        "viso-mcp": {
-            "command": "docker",
-            "args": [
-                "run",
-                "-i",
-                "--rm",
-                "-e", "VISOTRUST_API_TOKEN",
-                "-e", "VISOTRUST_API_BASEURL",
-                "viso-mcp-server"
-            ],
-            "env": {
-                "VISOTRUST_API_TOKEN": "<your-api-token>",
-                "VISOTRUST_API_BASEURL": "https://app.visotrust.com"
-            }
-        }
-    }
-}
-```
 
 ## 💻 Development
 
