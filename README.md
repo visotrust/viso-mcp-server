@@ -1,4 +1,4 @@
-# VISO MCP Server
+# VISO TRUST MCP Server
 
 A Model Context Protocol (MCP) server for integrating VISO TRUST API capabilities with AI assistants.
 
