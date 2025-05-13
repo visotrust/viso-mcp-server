@@ -1,3 +1,4 @@
+/* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver;
 
 import org.springframework.boot.SpringApplication;
@@ -9,5 +10,4 @@ public class VisoMcpServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(VisoMcpServerApplication.class, args);
     }
-
 }

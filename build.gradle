@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.5'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.25.0'
+    id 'com.github.jakemarsden.git-hooks' version '0.0.2'
 }
 
 group = 'com.visotrust.viso'
@@ -42,4 +44,36 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+spotless {
+    java {
+        // Use Google's Java formatter
+        googleJavaFormat().aosp()
+
+        // Remove unused imports
+        importOrder()
+        removeUnusedImports()
+
+        // Add license header
+        licenseHeader '/* Copyright (c) 2025 VISO TRUST */'
+
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    format 'misc', {
+        // Define the files to format
+        target '**/*.md', '**/*.xml', '**/*.yml', '**/*.yaml', '**/*.json', '**/*.properties'
+
+        // Define the formatting rules
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+}
+
+// Configure Git hooks
+gitHooks {
+    hooks = ['pre-commit': 'spotlessCheck']
 }

@@ -1,3 +1,4 @@
+/* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

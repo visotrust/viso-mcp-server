@@ -1,9 +1,11 @@
+/* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.service.assessment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -15,8 +17,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 @Service
 public class AssessmentService {
 
@@ -26,22 +26,23 @@ public class AssessmentService {
     private final ObjectMapper objectMapper;
     private final String baseUrl;
 
-    public AssessmentService(ApiService apiService, RestTemplate restTemplate, ObjectMapper objectMapper,
-                             @Value("${visotrust.api.base-url}") String baseUrl) {
+    public AssessmentService(
+            ApiService apiService,
+            RestTemplate restTemplate,
+            ObjectMapper objectMapper,
+            @Value("${visotrust.api.base-url}") String baseUrl) {
         this.apiService = apiService;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.baseUrl = baseUrl;
     }
 
-    @Tool(name = "get_assessment",
-            description = "Get an assessment by its ID")
+    @Tool(name = "get_assessment", description = "Get an assessment by its ID")
     public Assessment getAssessment(Long id) {
         return apiService.get(ASSESSMENTS_API_PATH + "/" + id, Assessment.class);
     }
 
-    @Tool(name = "create_assessment",
-            description = "Start an Assessment")
+    @Tool(name = "create_assessment", description = "Start an Assessment")
     public Assessment createAssessment(AssessmentCreateRequest request, List<byte[]> files) {
         try {
             // Create headers
@@ -57,20 +58,23 @@ public class AssessmentService {
             // Add the files part
             for (int i = 0; i < files.size(); i++) {
                 int fileIndex = i;
-                ByteArrayResource fileResource = new ByteArrayResource(files.get(i)) {
-                    @Override
-                    public String getFilename() {
-                        return "file" + fileIndex + ".pdf";
-                    }
-                };
+                ByteArrayResource fileResource =
+                        new ByteArrayResource(files.get(i)) {
+                            @Override
+                            public String getFilename() {
+                                return "file" + fileIndex + ".pdf";
+                            }
+                        };
                 body.add("files", fileResource);
             }
 
             // Create the request entity
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                    new HttpEntity<>(body, headers);
 
             // Send the request
-            return restTemplate.postForObject(baseUrl + ASSESSMENTS_API_PATH, requestEntity, Assessment.class);
+            return restTemplate.postForObject(
+                    baseUrl + ASSESSMENTS_API_PATH, requestEntity, Assessment.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create assessment", e);
         }

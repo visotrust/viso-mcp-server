@@ -1,18 +1,18 @@
+/* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.config;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbacks;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.ai.tool.annotation.Tool;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbacks;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class McpConfig {
@@ -53,7 +53,10 @@ public class McpConfig {
             // If the bean has at least one method with @Tool annotation, register it
             if (hasToolAnnotation) {
                 String beanClassName = bean.getClass().getName();
-                logger.info("Registering bean {} with {} @Tool methods", beanClassName, toolMethodCount);
+                logger.info(
+                        "Registering bean {} with {} @Tool methods",
+                        beanClassName,
+                        toolMethodCount);
                 toolCallbacks.addAll(List.of(ToolCallbacks.from(bean)));
                 registeredBeans++;
             }

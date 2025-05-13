@@ -1,11 +1,11 @@
+/* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.service.contexttype;
 
 import com.visotrust.viso.visomcpserver.model.contexttype.ContextTypeView;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ContextTypeService {
@@ -17,7 +17,8 @@ public class ContextTypeService {
         this.apiService = apiService;
     }
 
-    @Tool(name = "get_all_business_cases",
+    @Tool(
+            name = "get_all_business_cases",
             description = "Get all available business cases for your organization.")
     public List<ContextTypeView> getAllBusinessCases() {
         return apiService.getList(CONTEXT_TYPES_API_PATH, ContextTypeView.class);
