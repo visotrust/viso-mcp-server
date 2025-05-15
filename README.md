@@ -11,16 +11,16 @@ A Model Context Protocol (MCP) server for integrating VISO TRUST API capabilitie
 
 ## Configuration
 
-### VISO Trust API Configuration
+### VISO TRUST API Configuration
 
-The following properties can be configured for the VISO Trust API:
+The following properties can be configured for the VISO TRUST API:
 
-- `visotrust.api.base-url`: The base URL for the VISO Trust API (default: http://localhost:8080)
-- `visotrust.api.token`: Your API token from the VISO Trust platform (required)
+- `visotrust.api.base-url`: The base URL for the VISO TRUST API (default: http://localhost:8080)
+- `visotrust.api.token`: Your API token from the VISO TRUST platform (required)
 - `visotrust.api.timeout`: API request timeout in milliseconds (default: 30000)
 - `visotrust.api.connect-timeout`: API connection timeout in milliseconds (default: 5000)
 
-For information on how to generate an API token for the `visotrust.api.token` environment variable, see the [VISO Trust support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
+For information on how to generate an API token for the `visotrust.api.token` environment variable, see the [VISO TRUST support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
 
 ## Installation
 
