@@ -60,7 +60,7 @@ Add the following JSON block to your User Settings (JSON) file in VS Code. You c
           "VISOTRUST_API_TOKEN",
           "-e",
           "VISOTRUST_API_BASEURL",
-          "viso-mcp-server"
+          "visotrustai/viso-mcp-server:latest"
         ],
         "env": {
           "VISOTRUST_API_BASEURL": "${input:viso_baseurl}",
@@ -100,7 +100,7 @@ Optionally, you can add a similar example (i.e. without the mcp key) to a file c
         "VISOTRUST_API_TOKEN",
         "-e",
         "VISOTRUST_API_BASEURL",
-        "viso-mcp-server"
+        "visotrustai/viso-mcp-server:latest"
       ],
       "env": {
         "VISOTRUST_API_BASEURL": "${input:viso_baseurl}",
@@ -123,7 +123,7 @@ Optionally, you can add a similar example (i.e. without the mcp key) to a file c
                 "--rm",
                 "-e", "VISOTRUST_API_TOKEN",
                 "-e", "VISOTRUST_API_BASEURL",
-                "viso-mcp-server"
+                "visotrustai/viso-mcp-server:latest"
             ],
             "env": {
                 "VISOTRUST_API_TOKEN": "<your-api-token>",

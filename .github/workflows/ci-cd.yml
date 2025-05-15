@@ -125,5 +125,5 @@ jobs:
           build-args: |
             VERSION=${{ env.VERSION }}
           tags: |
-            visotrust/viso-mcp-server:latest
-            visotrust/viso-mcp-server:${{ github.event.release.tag_name }}
+            visotrustai/viso-mcp-server:latest
+            visotrustai/viso-mcp-server:${{ github.event.release.tag_name }}

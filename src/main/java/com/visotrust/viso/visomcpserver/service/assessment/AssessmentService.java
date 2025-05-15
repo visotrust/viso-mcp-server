@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.service.ApiService;
-import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -43,7 +41,7 @@ public class AssessmentService {
     }
 
     @Tool(name = "create_assessment", description = "Start an Assessment")
-    public Assessment createAssessment(AssessmentCreateRequest request, List<byte[]> files) {
+    public Assessment createAssessment(AssessmentCreateRequest request) {
         try {
             // Create headers
             HttpHeaders headers = new HttpHeaders();
@@ -54,19 +52,6 @@ public class AssessmentService {
 
             // Add the request part
             body.add("request", objectMapper.writeValueAsString(request));
-
-            // Add the files part
-            for (int i = 0; i < files.size(); i++) {
-                int fileIndex = i;
-                ByteArrayResource fileResource =
-                        new ByteArrayResource(files.get(i)) {
-                            @Override
-                            public String getFilename() {
-                                return "file" + fileIndex + ".pdf";
-                            }
-                        };
-                body.add("files", fileResource);
-            }
 
             // Create the request entity
             HttpEntity<MultiValueMap<String, Object>> requestEntity =
