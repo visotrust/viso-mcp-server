@@ -142,7 +142,7 @@ Optionally, you can add a similar example (i.e. without the mcp key) to a file c
             "command": "java",
             "args": [
                 "-jar",
-                "viso-mcp-server-1.0.0.jar",
+                "viso-mcp-server-<version>.jar",
                 "--port",
                 "8080",
                 "--host",
@@ -192,33 +192,44 @@ npm -g install @modelcontextprotocol/inspector
 npx @modelcontextprotocol/inspector \
     -e JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=\*:5005 \
     -e VISOTRUST_API_TOKEN=<your-api-token> \
-    java -jar build/libs/viso-mcp-server-1.0.0.jar \
+    java -jar build/libs/viso-mcp-server-<version>.jar \
     --port 8080 --host localhost
 ```
 
-### Code Formatting
+Replace `<version>` with the current version of the project (e.g., `1.0.0` or the version from the latest release).
 
-This project uses [Spotless](https://github.com/diffplug/spotless) with Google Java Format for code formatting. A pre-commit hook is automatically set up to ensure consistent code style.
+### CI/CD Pipeline
 
-#### Setup
+This project uses GitHub Actions for continuous integration and deployment. The workflow includes the following jobs:
 
-After cloning the repository, the pre-commit hook will be automatically set up when you run any Gradle command.
+#### Lint
 
-#### Manual Formatting
-
-To manually format all files:
-
-```bash
-./gradlew spotlessApply
-```
-
-To check if files are formatted correctly:
-
+Checks code formatting using Spotless:
 ```bash
 ./gradlew spotlessCheck
 ```
 
-If the pre-commit hook rejects your commit due to formatting issues, simply run `./gradlew spotlessApply` to fix the formatting and then try committing again.
+#### Build
+
+Builds the application and creates a JAR file:
+```bash
+./gradlew build
+```
+
+#### Publish
+
+When a new release is created:
+1. Updates the project version in build.gradle to match the release tag
+2. Uploads the JAR file to the GitHub release with the version from the release tag
+3. Builds and pushes the Docker image to Docker Hub with tags:
+   - `latest`
+   - The release tag (e.g., `v1.0.0`)
+
+##### Required Secrets for Publishing
+
+To enable Docker Hub publishing, add these secrets to your GitHub repository:
+- `DOCKERHUB_USERNAME`: Your Docker Hub username
+- `DOCKERHUB_TOKEN`: Your Docker Hub access token
 
 ## 🛠️ Tools
 
@@ -387,6 +398,29 @@ Returns the updated webhook configuration.
 
 Deletes the specified webhook configuration.
 
+## Code Formatting
+
+This project uses [Spotless](https://github.com/diffplug/spotless) with Google Java Format for code formatting. A pre-commit hook is automatically set up to ensure consistent code style.
+
+### Setup
+
+After cloning the repository, the pre-commit hook will be automatically set up when you run any Gradle command.
+
+### Manual Formatting
+
+To manually format all files:
+
+```bash
+./gradlew spotlessApply
+```
+
+To check if files are formatted correctly:
+
+```bash
+./gradlew spotlessCheck
+```
+
+If the pre-commit hook rejects your commit due to formatting issues, simply run `./gradlew spotlessApply` to fix the formatting and then try committing again.
 
 ## License
 
