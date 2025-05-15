@@ -30,6 +30,9 @@ RUN ./gradlew bootJar --no-daemon
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+# Redefine the VERSION argument in the runtime stage
+ARG VERSION=1.0.0
+
 # Set environment variables
 ENV SPRING_AI_MCP_SERVER_STDIO=true
 ENV SPRING_MAIN_WEB_APPLICATION_TYPE=none
