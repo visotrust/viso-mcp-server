@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.25.0'
+    id 'com.github.jakemarsden.git-hooks' version '0.0.2'
+}
+
+group = 'com.visotrust.viso'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springAiVersion', "1.0.0-M8")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+spotless {
+    java {
+        // Use Google's Java formatter
+        googleJavaFormat().aosp()
+
+        // Remove unused imports
+        importOrder()
+        removeUnusedImports()
+
+        // Add license header
+        licenseHeader '/* Copyright (c) 2025 VISO TRUST */'
+
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    format 'misc', {
+        // Define the files to format
+        target '**/*.md', '**/*.xml', '**/*.yml', '**/*.yaml', '**/*.json', '**/*.properties'
+
+        // Define the formatting rules
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+}
+
+// Configure Git hooks
+gitHooks {
+    hooks = ['pre-commit': 'spotlessCheck']
+}
