@@ -22,6 +22,47 @@ The following properties can be configured for the VISO TRUST API:
 
 For information on how to generate an API token for the `visotrust.api.token` environment variable, see the [VISO TRUST support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
 
+### Application Profiles
+
+This application supports Spring Boot profiles to enable different configurations for different deployment scenarios.
+
+#### Remote Profile
+
+The `remote` profile is specifically designed for **remote MCP support using Server-Sent Events (SSE)**. This profile configures the application to work optimally in distributed environments where the MCP server needs to communicate with remote clients over HTTP/SSE connections.
+
+**Key differences in the remote profile:**
+- Configured for SSE-based communication instead of standard I/O
+- Optimized server settings for remote client connections
+- Enhanced logging for distributed debugging
+
+**How to activate the remote profile:**
+
+When running with Java directly:
+```bash
+java -jar viso-mcp-server-<version>.jar --spring.profiles.active=remote
+```
+
+When running with Gradle:
+```bash
+./gradlew bootRun --args="--spring.profiles.active=remote"
+```
+
+When using Docker:
+```bash
+docker run -i --rm \
+  -e VISOTRUST_API_TOKEN=<your-api-token> \
+  -e SPRING_PROFILES_ACTIVE=remote \
+  viso-mcp-server
+```
+
+**When to use the remote profile:**
+- When deploying the MCP server to a remote server or cloud environment
+- When clients will connect via HTTP/SSE rather than direct stdio
+- When you need enhanced logging and monitoring for distributed deployments
+- When integrating with web-based AI assistants that require SSE communication
+
+For local development and direct stdio communication, use the default profile (no profile specification needed).
+
 ## Installation
 
 ### Quick Install
