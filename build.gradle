@@ -1,13 +1,13 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
+    id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.diffplug.spotless' version '6.25.0'
+    id 'com.diffplug.spotless' version '7.2.1'
     id 'com.github.jakemarsden.git-hooks' version '0.0.2'
 }
 
 group = 'com.visotrust.viso'
-version = '1.0.0'
+version = '1.1.0'
 
 java {
     toolchain {
@@ -17,19 +17,32 @@ java {
 
 repositories {
     mavenCentral()
+    // Add Spring milestone and snapshot repositories for accessing SNAPSHOT versions
+    maven {
+        name = "Spring Milestones"
+        url = "https://repo.spring.io/milestone"
+    }
+    maven {
+        name = "Spring Snapshots"
+        url = "https://repo.spring.io/snapshot"
+    }
 }
 
 ext {
-    set('springAiVersion', "1.0.0-M8")
+    set('springAiVersion', "1.1.0-SNAPSHOT")
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'org.apache.httpcomponents.client5:httpclient5'
+
+    // Spring Security dependencies (without starter)
+    implementation 'org.springframework.security:spring-security-web'
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-core'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
