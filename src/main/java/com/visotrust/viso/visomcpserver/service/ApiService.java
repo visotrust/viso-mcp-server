@@ -2,17 +2,23 @@
 package com.visotrust.viso.visomcpserver.service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ApiService {
+
+    private final Logger log = LoggerFactory.getLogger(ApiService.class);
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
@@ -21,7 +27,7 @@ public class ApiService {
     public ApiService(
             RestTemplate restTemplate,
             @Value("${visotrust.api.base-url}") String baseUrl,
-            @Value("${visotrust.api.token}") String apiToken) {
+            @Value("${visotrust.api.token:#{null}}") String apiToken) {
         this.restTemplate = restTemplate;
         this.baseUrl = baseUrl;
         this.apiToken = apiToken;
@@ -29,8 +35,35 @@ public class ApiService {
 
     private HttpHeaders createHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
+
+        // Extract JWT token from Spring Security context, or fallback to static token
+        String tokenToUse = extractJwtFromSecurityContext();
+        if (tokenToUse == null) {
+            tokenToUse = apiToken;
+            log.info("No JWT token found in security context, using static API token");
+        } else {
+            log.info("Using JWT token from security context");
+        }
+
+        headers.set("Authorization", "Bearer " + tokenToUse);
         return headers;
+    }
+
+    /**
+     * Extracts JWT token from Spring Security context.
+     *
+     * @return JWT token if available in security context, null otherwise
+     */
+    private String extractJwtFromSecurityContext() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getCredentials() instanceof String) {
+                return (String) authentication.getCredentials();
+            }
+        } catch (Exception e) {
+            log.debug("Failed to extract JWT from security context: {}", e.getMessage());
+        }
+        return null;
     }
 
     public <T> T get(String path, Class<T> responseType) {
