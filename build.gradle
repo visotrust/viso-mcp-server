@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.visotrust.viso'
-version = '1.1.0'
+version = '1.1.1'
 
 java {
     toolchain {
@@ -17,19 +17,10 @@ java {
 
 repositories {
     mavenCentral()
-    // Add Spring milestone and snapshot repositories for accessing SNAPSHOT versions
-    maven {
-        name = "Spring Milestones"
-        url = "https://repo.spring.io/milestone"
-    }
-    maven {
-        name = "Spring Snapshots"
-        url = "https://repo.spring.io/snapshot"
-    }
 }
 
 ext {
-    set('springAiVersion', "1.1.0-SNAPSHOT")
+    set('springAiVersion', "1.1.0-M1")
 }
 
 dependencies {
