@@ -296,6 +296,11 @@ Returns detailed information about a specific assessment.
 
 Returns the created assessment details.
 
+#### `get_assessment_summary` - Get the summary for an assessment by its ID
+- id: Assessment ID (number, required)
+
+Returns the summary details for a specific assessment.
+
 ### Audit Logs
 
 #### `get_user_audit_log_events` - Get the audit log events for your organization
@@ -403,6 +408,20 @@ Returns the updated relationship details.
 
 Returns a list of potential contacts at the vendor organization.
 
+#### `get_relationship_assessment_history` - Get the assessment history for a relationship
+- id: Relationship ID (number, required)
+
+Returns a list of assessments associated with the specified relationship.
+
+#### `create_relationship_by_domain` - Create a new relationship using only the vendor domain
+- request: Relationship creation parameters (object, required)
+  - domain: Domain of the vendor (string, required, e.g., visotrust.com)
+  - vendorName: Name of the vendor (string, required)
+  - product: Product offered by the vendor (string, optional)
+  - description: Description of the vendor relationship (string, optional)
+
+Returns the created relationship details.
+
 ### Webhooks
 
 #### `get_all_webhooks` - Get all webhooks
@@ -438,6 +457,68 @@ Returns the updated webhook configuration.
 - id: Webhook ID (number, required)
 
 Deletes the specified webhook configuration.
+
+### Intelligence Reports
+
+#### `create_bitsight_intelligence_report` - Create a new BitSight intelligence report
+- request: BitSight report parameters (object, required)
+  - vendorDomain: The vendor's primary domain name (string, required)
+  - reportDate: The date/time the report was generated (ISO 8601 string, required)
+  - link: Optional link to the provider's UI (string, optional)
+  - guid: BitSight GUID for the entity (string, required)
+  - customId: Custom identifier from BitSight (string, optional)
+  - name: Display name of the BitSight entity (string, optional)
+  - description: Description of the BitSight entity (string, optional)
+  - primaryDomain: Primary domain for the BitSight entity (string, optional)
+  - ratingRange: BitSight rating range (string, optional)
+  - ratingColor: BitSight rating color (string, optional)
+  - confidence: Confidence level of the BitSight rating (string, optional)
+
+Returns the created intelligence report.
+
+#### `create_security_scorecard_intelligence_report` - Create a new SecurityScorecard intelligence report
+- request: SecurityScorecard report parameters (object, required)
+  - vendorDomain: The vendor's primary domain name (string, required)
+  - reportDate: The date/time the report was generated (ISO 8601 string, required)
+  - link: Optional link to the provider's UI (string, optional)
+  - grade: SecurityScorecard letter grade (string, required)
+  - domain: Domain associated with the scorecard entity (string, optional)
+  - score: Numeric score from SecurityScorecard (number, optional)
+
+Returns the created intelligence report.
+
+#### `get_intelligence_reports_by_vendor` - Get all intelligence reports for a vendor
+- vendorDomain: The vendor's primary domain name (string, required)
+
+Returns a list of intelligence reports for the specified vendor.
+
+#### `get_latest_intelligence_report` - Get the latest intelligence report for a vendor from a specific source
+- vendorDomain: The vendor's primary domain name (string, required)
+- source: Intelligence provider (string enum: BITSIGHT or SECURITY_SCORECARD, required)
+
+Returns the latest intelligence report for the specified vendor and source.
+
+### Users
+
+#### `get_all_users` - Get all users in your organization
+- page: Results page to retrieve (number, optional; default 0)
+- size: Number of records per page (number, optional; default 20)
+- sort: Sorting criteria in the format: property(,asc|desc) (string, optional)
+
+Returns a paginated list of users.
+
+#### `get_user_by_email` - Get a user by email
+- email: User's email address (string, required)
+
+Returns the user details.
+
+#### `create_user` - Create a new user
+- request: User creation parameters (object, required)
+  - email: Email address of the new user (string, required)
+  - firstName: First name of the new user (string, required)
+  - lastName: Last name of the new user (string, required)
+
+Returns the created user.
 
 ## Code Formatting
 
