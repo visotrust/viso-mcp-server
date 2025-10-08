@@ -42,7 +42,7 @@ public class AssessmentService {
 
     @Tool(
             name = "get_assessment_summary",
-            description = "Get a the summary for an assessment by its ID")
+            description = "Get the summary for an assessment by its ID")
     public AssessmentSummary getAssessmentSummary(
             @ToolParam(description = "The unique ID of the assessment to get the details for")
                     Long id) {
