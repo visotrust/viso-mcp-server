@@ -4,8 +4,11 @@ package com.visotrust.viso.visomcpserver.service.assessment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
+import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import javax.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,8 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 
+@Validated
 @Service
 public class AssessmentService {
 
@@ -35,13 +40,27 @@ public class AssessmentService {
         this.baseUrl = baseUrl;
     }
 
-    @Tool(name = "get_assessment", description = "Get an assessment by its ID")
-    public Assessment getAssessment(Long id) {
-        return apiService.get(ASSESSMENTS_API_PATH + "/" + id, Assessment.class);
+    @Tool(
+            name = "get_assessment_summary",
+            description = "Get the summary for an assessment by its ID")
+    public AssessmentSummary getAssessmentSummary(
+            @ToolParam(description = "The unique ID of the assessment to get the details for")
+                    Long id) {
+        return apiService.get(
+                String.format("%s/%d/summary", ASSESSMENTS_API_PATH, id), AssessmentSummary.class);
     }
 
-    @Tool(name = "create_assessment", description = "Start an Assessment")
-    public Assessment createAssessment(AssessmentCreateRequest request) {
+    @Tool(name = "get_assessment", description = "Get an assessment by its ID")
+    public Assessment getAssessment(
+            @ToolParam(description = "The unique ID of the assessment to get the details for")
+                    Long id) {
+        return apiService.get(String.format("%s/%d", ASSESSMENTS_API_PATH, id), Assessment.class);
+    }
+
+    @Tool(
+            name = "create_assessment",
+            description = "Start an Assessment for an existing relationship")
+    public Assessment createAssessment(@Valid AssessmentCreateRequest request) {
         try {
             // Create headers
             HttpHeaders headers = new HttpHeaders();
