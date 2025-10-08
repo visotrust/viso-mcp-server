@@ -3,24 +3,29 @@ package com.visotrust.viso.visomcpserver.model.assessment;
 
 import com.visotrust.viso.visomcpserver.model.common.RiskLevel;
 import com.visotrust.viso.visomcpserver.model.common.VisoUser;
-import jakarta.annotation.Nullable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 public record Assessment(
         Long id,
-        @Nullable LocalDateTime phaseDate,
-        @Nullable VisoUser sentBy,
-        LocalDateTime createdDate,
-        @Nullable String summary,
-        LocalDateTime updatedDate,
-        String sentToEmail,
-        AssessmentStatus status,
-        List<AssessmentStatusHistory> statusHistories,
-        @Nullable LocalDateTime completedDate,
-        FollowupType followupType,
-        String assessmentType,
+        VisoUser sentBy,
+        boolean aiProcessingOnly,
         String sentToFirstName,
         String sentToLastName,
-        @Nullable LocalDateTime expirationDate,
-        @Nullable RiskLevel followupRiskThreshold) {}
+        String sentToEmail,
+        ZonedDateTime createdDate,
+        ZonedDateTime updatedDate,
+        ZonedDateTime phaseDate,
+        ZonedDateTime completedDate,
+        ZonedDateTime expirationDate,
+        AssessmentStatus status,
+        List<AssessmentStatusHistory> statusHistories,
+        String assessmentType,
+        FollowupType followupType,
+        RiskLevel followupRiskThreshold,
+        FollowupTimeline followupTimeline,
+        CollectionTimeline collectionTimeline,
+        NoVendorResponseAction noVendorResponseAction,
+        boolean requestedArtifactCollection,
+        Set<AssessmentRecommendation> recommendations) {}

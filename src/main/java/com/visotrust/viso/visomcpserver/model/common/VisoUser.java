@@ -4,4 +4,9 @@ package com.visotrust.viso.visomcpserver.model.common;
 import jakarta.annotation.Nullable;
 
 public record VisoUser(
-        String email, String firstName, String lastName, @Nullable String businessUnit) {}
+        Long id,
+        String firstName,
+        String lastName,
+        String email,
+        @Nullable String businessUnit,
+        @Nullable UserStatus status) {}

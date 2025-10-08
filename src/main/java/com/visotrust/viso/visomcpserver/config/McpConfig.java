@@ -9,7 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,8 @@ public class McpConfig {
     private static final Logger logger = LoggerFactory.getLogger(McpConfig.class);
 
     @Bean
-    public List<ToolCallback> registerTools(ApplicationContext applicationContext) {
+    public List<ToolCallback> registerTools(ApplicationContext applicationContext)
+            throws Exception {
         logger.info("Scanning for service beans with @Tool annotations...");
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
@@ -30,9 +32,14 @@ public class McpConfig {
 
         // Filter beans to only include those in the service package
         for (Map.Entry<String, Object> entry : allBeans.entrySet()) {
-            String className = entry.getValue().getClass().getName();
+            Object beanInstance = entry.getValue();
+            String className = beanInstance.getClass().getName();
+
             if (className.contains("com.visotrust.viso.visomcpserver.service")) {
-                beans.put(entry.getKey(), entry.getValue());
+                if (AopUtils.isAopProxy(beanInstance) && beanInstance instanceof Advised) {
+                    beanInstance = ((Advised) beanInstance).getTargetSource().getTarget();
+                }
+                beans.put(entry.getKey(), beanInstance);
             }
         }
 
@@ -44,7 +51,7 @@ public class McpConfig {
             boolean hasToolAnnotation = false;
             int toolMethodCount = 0;
             for (Method method : bean.getClass().getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Tool.class)) {
+                if (method.isAnnotationPresent(org.springframework.ai.tool.annotation.Tool.class)) {
                     hasToolAnnotation = true;
                     toolMethodCount++;
                 }

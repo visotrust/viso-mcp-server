@@ -1,16 +1,12 @@
 /* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.service.relationship;
 
-import com.visotrust.viso.visomcpserver.model.relationship.Relationship;
-import com.visotrust.viso.visomcpserver.model.relationship.RelationshipCreateInput;
-import com.visotrust.viso.visomcpserver.model.relationship.RelationshipSearchInput;
-import com.visotrust.viso.visomcpserver.model.relationship.RelationshipUpdateInput;
-import com.visotrust.viso.visomcpserver.model.relationship.SuggestedContactView;
-import com.visotrust.viso.visomcpserver.model.relationship.TagsCreateInput;
-import com.visotrust.viso.visomcpserver.model.relationship.ThirdPartyContactUpdateRequest;
+import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
+import com.visotrust.viso.visomcpserver.model.relationship.*;
 import com.visotrust.viso.visomcpserver.service.ApiService;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +34,30 @@ public class RelationshipService {
             name = "get_relationship_by_id",
             description =
                     "Get a specific relationship and its assessment details by ID. Returns detailed information about a third-party vendor including assessment status, risk levels, and contact details.")
-    public Relationship getRelationshipById(Long id) {
+    public Relationship getRelationshipById(
+            @ToolParam(description = "The id of the relationship") Long id) {
         return apiService.get(RELATIONSHIPS_API_PATH + "/" + id, Relationship.class);
+    }
+
+    @Tool(
+            name = "get_relationship_assessment_history",
+            description =
+                    "Get a list of all of the assessments associated with a relationship by its ID.")
+    public List<Assessment> getRelationshipAssessmentHistory(
+            @ToolParam(description = "The id of the relationship") Long id) {
+        return apiService.getList(
+                String.format("%s/%d/assessments", "/api/v1/relationship", id), Assessment.class);
+    }
+
+    @Tool(
+            name = "get_suggested_contacts",
+            description =
+                    "Get a list of suggested contacts for a specific relationship. These are potential contacts at the vendor organization that the system has identified based on previous interactions or public information.")
+    public List<SuggestedContactView> getSuggestedContacts(
+            @ToolParam(description = "The id of the relationship") Long relationshipId) {
+        return apiService.getList(
+                RELATIONSHIPS_API_PATH + "/" + relationshipId + "/suggested-contacts",
+                SuggestedContactView.class);
     }
 
     @Tool(
@@ -48,6 +66,15 @@ public class RelationshipService {
                     "Create a new relationship with a third-party vendor. Requires vendor name, and a Business Owner email, supports optional information such as homepage, business context, and data types.")
     public Relationship createRelationship(RelationshipCreateInput request) {
         return apiService.post(RELATIONSHIPS_API_PATH, request, Relationship.class);
+    }
+
+    @Tool(
+            name = "create_relationship_by_domain",
+            description =
+                    "Initialize a new vendor relationship by providing only the essential domain name and vendor name. This simplified creation method requires minimal information to establish a basic vendor record.")
+    public Relationship createRelationshipByDomain(CreateRelationshipByDomainRequest request) {
+        return apiService.post(
+                String.format("%s/domain", RELATIONSHIPS_API_PATH), request, Relationship.class);
     }
 
     @Tool(
@@ -72,9 +99,7 @@ public class RelationshipService {
                     "Search for relationships by domain name or vendor name. Returns a list of matching relationships with their assessment details.")
     public List<Relationship> searchRelationships(RelationshipSearchInput request) {
         return apiService.post(
-                RELATIONSHIPS_API_PATH + "/search",
-                request,
-                new ParameterizedTypeReference<List<Relationship>>() {});
+                RELATIONSHIPS_API_PATH + "/search", request, new ParameterizedTypeReference<>() {});
     }
 
     @Tool(
@@ -82,8 +107,7 @@ public class RelationshipService {
             description =
                     "Create new tags that can be used to categorize and filter relationships. Returns a list of all tags including the newly created ones.")
     public List<String> createTags(TagsCreateInput request) {
-        return apiService.post(
-                TAGS_API_PATH, request, new ParameterizedTypeReference<List<String>>() {});
+        return apiService.post(TAGS_API_PATH, request, new ParameterizedTypeReference<>() {});
     }
 
     @Tool(
@@ -92,15 +116,5 @@ public class RelationshipService {
                     "Update the contact details for a third-party vendor. This allows you to specify or change the primary contact person at the vendor organization who will receive assessment requests.")
     public Relationship updateThirdPartyContact(ThirdPartyContactUpdateRequest request) {
         return apiService.put(THIRD_PARTY_CONTACT_API_PATH, request, Relationship.class);
-    }
-
-    @Tool(
-            name = "get_suggested_contacts",
-            description =
-                    "Get a list of suggested contacts for a specific relationship. These are potential contacts at the vendor organization that the system has identified based on previous interactions or public information.")
-    public List<SuggestedContactView> getSuggestedContacts(Long relationshipId) {
-        return apiService.getList(
-                RELATIONSHIPS_API_PATH + "/" + relationshipId + "/suggested-contacts",
-                SuggestedContactView.class);
     }
 }
