@@ -1,13 +1,13 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.5'
+    id 'org.springframework.boot' version '3.5.12'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '7.2.1'
     id 'com.github.jakemarsden.git-hooks' version '0.0.2'
 }
 
 group = 'com.visotrust.viso'
-version = '1.2.0'
+version = '1.2.1'
 
 java {
     toolchain {
@@ -20,7 +20,7 @@ repositories {
 }
 
 ext {
-    set('springAiVersion', "1.1.0-M2")
+    set('springAiVersion', "1.1.3")
 }
 
 dependencies {
@@ -70,6 +70,7 @@ spotless {
     format 'misc', {
         // Define the files to format
         target '**/*.md', '**/*.xml', '**/*.yml', '**/*.yaml', '**/*.json', '**/*.properties'
+        targetExclude '.idea/**'
 
         // Define the formatting rules
         trimTrailingWhitespace()
