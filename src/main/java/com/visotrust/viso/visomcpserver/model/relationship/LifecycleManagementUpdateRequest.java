@@ -18,20 +18,17 @@ public record LifecycleManagementUpdateRequest(
                 RecertificationSettings recertificationSettings) {
 
     public record ArtifactUpdateSettings(
-            @ToolParam(description = "Artifact update type: MANUAL, AUTOMATIC, or NONE") @NotNull
+            @ToolParam(description = "Artifact update type") @NotNull
                     RecertificationType artifactUpdateType) {}
 
     public record RecertificationSettings(
-            @ToolParam(description = "Recertification type: MANUAL, AUTOMATIC, or NONE") @NotNull
+            @ToolParam(description = "Recertification type") @NotNull
                     RecertificationType recertificationType,
             @ToolParam(
                             description =
                                     "Date/time (ISO-8601 with offset) when the next recertification should occur")
                     @NotNull
                     ZonedDateTime recertificationDate,
-            @ToolParam(
-                            description =
-                                    "How frequently recertification should recur (THREE_YEARS, TWO_YEARS, ANNUAL, SEMIANNUAL, QUARTERLY)")
-                    @NotNull
+            @ToolParam(description = "How frequently recertification should recur") @NotNull
                     ReviewFrequency reviewFrequency) {}
 }

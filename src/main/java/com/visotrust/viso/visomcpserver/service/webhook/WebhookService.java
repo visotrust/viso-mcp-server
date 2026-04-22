@@ -6,6 +6,7 @@ import com.visotrust.viso.visomcpserver.model.webhook.WebhookCreateUpdateRequest
 import com.visotrust.viso.visomcpserver.service.ApiService;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,7 +25,8 @@ public class WebhookService {
     }
 
     @Tool(name = "get_webhook", description = "Get a webhook configuration by id.")
-    public Webhook getWebhookById(Long id) {
+    public Webhook getWebhookById(
+            @ToolParam(description = "The unique numeric ID of the webhook") Long id) {
         return apiService.get(WEBHOOKS_API_PATH + "/" + id, Webhook.class);
     }
 
@@ -39,7 +41,8 @@ public class WebhookService {
     }
 
     @Tool(name = "delete_webhook_configuration", description = "Delete a webhook configuration.")
-    public void deleteWebhook(Long id) {
+    public void deleteWebhook(
+            @ToolParam(description = "The unique numeric ID of the webhook to delete") Long id) {
         apiService.delete(WEBHOOKS_API_PATH + "/" + id);
     }
 }

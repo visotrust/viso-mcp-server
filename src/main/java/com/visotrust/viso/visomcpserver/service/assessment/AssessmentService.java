@@ -88,7 +88,8 @@ public class AssessmentService {
 
     @Tool(
             name = "update_assessment_expiration_date",
-            description = "Update the expiration date for an assessment")
+            description =
+                    "Update the assessment expiration date — the deadline by which the vendor must submit their assessment response")
     public String updateAssessmentExpirationDate(
             @ToolParam(description = "The unique ID of the assessment") Long id,
             @Valid UpdateAssessmentExpirationInput request) {

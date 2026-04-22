@@ -8,6 +8,6 @@ import org.springframework.ai.tool.annotation.ToolParam;
 public record UpdateAssessmentExpirationInput(
         @ToolParam(
                         description =
-                                "The new expiration date for the assessment (must be in the future)")
+                                "New assessment expiration date — deadline for vendor assessment submission (must be in the future)")
                 @NotNull
                 ZonedDateTime expirationDate) {}
