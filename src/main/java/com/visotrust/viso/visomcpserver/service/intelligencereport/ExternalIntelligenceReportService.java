@@ -7,12 +7,14 @@ import com.visotrust.viso.visomcpserver.model.intelligencereport.CreateSecurityS
 import com.visotrust.viso.visomcpserver.model.intelligencereport.ExternalIntelligenceReport;
 import com.visotrust.viso.visomcpserver.model.intelligencereport.IntelligenceProvider;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import jakarta.validation.Valid;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Service
 public class ExternalIntelligenceReportService {
 

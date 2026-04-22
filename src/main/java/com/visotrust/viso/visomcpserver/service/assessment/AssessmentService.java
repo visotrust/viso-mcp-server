@@ -8,7 +8,7 @@ import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
 import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentExpirationInput;
 import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentFollowupInput;
 import com.visotrust.viso.visomcpserver.service.ApiService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
