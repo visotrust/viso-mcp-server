@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
+import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentExpirationInput;
+import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentFollowupInput;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javax.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -81,6 +85,77 @@ public class AssessmentService {
                     baseUrl + ASSESSMENTS_API_PATH, requestEntity, Assessment.class);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create assessment", e);
+        }
+    }
+
+    @Tool(
+            name = "update_assessment_expiration_date",
+            description = "Update the expiration date for an assessment")
+    public String updateAssessmentExpirationDate(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @Valid UpdateAssessmentExpirationInput request) {
+        apiService.put(
+                String.format("%s/%d/expiration-date", ASSESSMENTS_API_PATH, id),
+                request,
+                Void.class);
+        return "Assessment expiration date updated.";
+    }
+
+    @Tool(
+            name = "update_assessment_followup",
+            description =
+                    "Update the follow-up configuration for an assessment (type, risk threshold, timeline)")
+    public String updateAssessmentFollowup(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @Valid UpdateAssessmentFollowupInput request) {
+        apiService.put(
+                String.format("%s/%d/followup", ASSESSMENTS_API_PATH, id), request, Void.class);
+        return "Assessment follow-up settings updated.";
+    }
+
+    @Tool(
+            name = "download_assessment_artifacts",
+            description =
+                    "Download all artifacts for an assessment as a zip file. The zip is written to the provided output path and the path is returned.")
+    public String downloadAssessmentArtifacts(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @ToolParam(
+                            description =
+                                    "Absolute filesystem path where the zip should be written, e.g. /tmp/assessment-123.zip")
+                    String outputPath) {
+        byte[] bytes =
+                apiService.getBytes(String.format("%s/%d/artifacts", ASSESSMENTS_API_PATH, id));
+        return writeBytesToPath(bytes, outputPath);
+    }
+
+    @Tool(
+            name = "export_assessment_summary_pdf",
+            description =
+                    "Export the assessment summary as a PDF. The PDF is written to the provided output path and the path is returned.")
+    public String exportAssessmentSummaryPdf(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @ToolParam(
+                            description =
+                                    "Absolute filesystem path where the PDF should be written, e.g. /tmp/assessment-123-summary.pdf")
+                    String outputPath) {
+        byte[] bytes =
+                apiService.getBytes(
+                        String.format("%s/%d/summary/export", ASSESSMENTS_API_PATH, id));
+        return writeBytesToPath(bytes, outputPath);
+    }
+
+    private String writeBytesToPath(byte[] bytes, String outputPath) {
+        try {
+            Path path = Path.of(outputPath);
+            if (path.getParent() != null) {
+                Files.createDirectories(path.getParent());
+            }
+            Files.write(path, bytes);
+            return String.format(
+                    "Wrote %d bytes to %s",
+                    bytes == null ? 0 : bytes.length, path.toAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to write download to " + outputPath, e);
         }
     }
 }

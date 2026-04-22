@@ -4,6 +4,9 @@ package com.visotrust.viso.visomcpserver.service.relationship;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.relationship.*;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import jakarta.annotation.Nullable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -47,17 +50,6 @@ public class RelationshipService {
             @ToolParam(description = "The id of the relationship") Long id) {
         return apiService.getList(
                 String.format("%s/%d/assessments", "/api/v1/relationship", id), Assessment.class);
-    }
-
-    @Tool(
-            name = "get_suggested_contacts",
-            description =
-                    "Get a list of suggested contacts for a specific relationship. These are potential contacts at the vendor organization that the system has identified based on previous interactions or public information.")
-    public List<SuggestedContactView> getSuggestedContacts(
-            @ToolParam(description = "The id of the relationship") Long relationshipId) {
-        return apiService.getList(
-                RELATIONSHIPS_API_PATH + "/" + relationshipId + "/suggested-contacts",
-                SuggestedContactView.class);
     }
 
     @Tool(
@@ -116,5 +108,64 @@ public class RelationshipService {
                     "Update the contact details for a third-party vendor. This allows you to specify or change the primary contact person at the vendor organization who will receive assessment requests.")
     public Relationship updateThirdPartyContact(ThirdPartyContactUpdateRequest request) {
         return apiService.put(THIRD_PARTY_CONTACT_API_PATH, request, Relationship.class);
+    }
+
+    @Tool(
+            name = "onboard_relationship",
+            description =
+                    "Onboard a relationship, optionally providing an approval summary and lifecycle management settings.")
+    public Relationship onboardRelationship(
+            @ToolParam(description = "The id of the relationship") Long id,
+            @ToolParam(required = false, description = "Optional onboarding details") @Nullable
+                    RelationshipOnboardRequest request) {
+        return apiService.put(
+                String.format("%s/%d/onboard", RELATIONSHIPS_API_PATH, id),
+                request,
+                Relationship.class);
+    }
+
+    @Tool(name = "offboard_relationship", description = "Offboard a relationship.")
+    public Relationship offboardRelationship(
+            @ToolParam(description = "The id of the relationship") Long id) {
+        return apiService.put(
+                String.format("%s/%d/offboard", RELATIONSHIPS_API_PATH, id),
+                null,
+                Relationship.class);
+    }
+
+    @Tool(name = "archive_relationship", description = "Archive a relationship.")
+    public Relationship archiveRelationship(
+            @ToolParam(description = "The id of the relationship") Long id) {
+        return apiService.put(
+                String.format("%s/%d/archive", RELATIONSHIPS_API_PATH, id),
+                null,
+                Relationship.class);
+    }
+
+    @Tool(
+            name = "download_relationship_artifacts",
+            description =
+                    "Download all artifacts for a relationship as a zip file. The zip is written to the provided output path and the path is returned.")
+    public String downloadRelationshipArtifacts(
+            @ToolParam(description = "The id of the relationship") Long id,
+            @ToolParam(
+                            description =
+                                    "Absolute filesystem path where the zip should be written, e.g. /tmp/relationship-123.zip")
+                    String outputPath) {
+        byte[] bytes =
+                apiService.getBytes(String.format("%s/%d/artifacts", RELATIONSHIPS_API_PATH, id));
+        try {
+            Path path = Path.of(outputPath);
+            if (path.getParent() != null) {
+                Files.createDirectories(path.getParent());
+            }
+            Files.write(path, bytes);
+            return String.format(
+                    "Wrote %d bytes to %s",
+                    bytes == null ? 0 : bytes.length, path.toAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to write relationship artifacts to " + outputPath, e);
+        }
     }
 }
