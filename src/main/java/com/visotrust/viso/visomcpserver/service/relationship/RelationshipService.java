@@ -5,8 +5,6 @@ import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.relationship.*;
 import com.visotrust.viso.visomcpserver.service.ApiService;
 import jakarta.annotation.Nullable;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -140,32 +138,5 @@ public class RelationshipService {
                 String.format("%s/%d/archive", RELATIONSHIPS_API_PATH, id),
                 null,
                 Relationship.class);
-    }
-
-    @Tool(
-            name = "download_relationship_artifacts",
-            description =
-                    "Download all artifacts for a relationship as a zip file. The zip is written to the provided output path and the path is returned.")
-    public String downloadRelationshipArtifacts(
-            @ToolParam(description = "The id of the relationship") Long id,
-            @ToolParam(
-                            description =
-                                    "Absolute filesystem path where the zip should be written, e.g. /tmp/relationship-123.zip")
-                    String outputPath) {
-        byte[] bytes =
-                apiService.getBytes(String.format("%s/%d/artifacts", RELATIONSHIPS_API_PATH, id));
-        try {
-            Path path = Path.of(outputPath);
-            if (path.getParent() != null) {
-                Files.createDirectories(path.getParent());
-            }
-            Files.write(path, bytes);
-            return String.format(
-                    "Wrote %d bytes to %s",
-                    bytes == null ? 0 : bytes.length, path.toAbsolutePath());
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Failed to write relationship artifacts to " + outputPath, e);
-        }
     }
 }

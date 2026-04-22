@@ -73,15 +73,6 @@ public class ApiService {
         return response.getBody();
     }
 
-    public byte[] getBytes(String path) {
-        HttpHeaders headers = createHeaders();
-        headers.set("Accept", "*/*");
-        HttpEntity<?> entity = new HttpEntity<>(headers);
-        ResponseEntity<byte[]> response =
-                restTemplate.exchange(baseUrl + path, HttpMethod.GET, entity, byte[].class);
-        return response.getBody();
-    }
-
     public <T> List<T> getList(String path, Class<T> elementType) {
         HttpEntity<?> entity = new HttpEntity<>(createHeaders());
         ResponseEntity<List<T>> response =
