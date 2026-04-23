@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
+import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentExpirationInput;
+import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentFollowupInput;
 import com.visotrust.viso.visomcpserver.service.ApiService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,5 +84,31 @@ public class AssessmentService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create assessment", e);
         }
+    }
+
+    @Tool(
+            name = "update_assessment_expiration_date",
+            description =
+                    "Update the assessment expiration date — the deadline by which the vendor must submit their assessment response")
+    public String updateAssessmentExpirationDate(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @Valid UpdateAssessmentExpirationInput request) {
+        apiService.put(
+                String.format("%s/%d/expiration-date", ASSESSMENTS_API_PATH, id),
+                request,
+                Void.class);
+        return "Assessment expiration date updated.";
+    }
+
+    @Tool(
+            name = "update_assessment_followup",
+            description =
+                    "Update the follow-up configuration for an assessment (type, risk threshold, timeline)")
+    public String updateAssessmentFollowup(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @Valid UpdateAssessmentFollowupInput request) {
+        apiService.put(
+                String.format("%s/%d/followup", ASSESSMENTS_API_PATH, id), request, Void.class);
+        return "Assessment follow-up settings updated.";
     }
 }
