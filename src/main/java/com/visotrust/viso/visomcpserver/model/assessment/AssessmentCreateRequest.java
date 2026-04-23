@@ -29,20 +29,16 @@ public record AssessmentCreateRequest(
                                 "List of URLs to public documents to be included in the assessment")
                 @Nullable
                 List<String> publicDocumentUrls,
-        @ToolParam(
-                        required = false,
-                        description = "Type of followup - manual, automatic or concierge")
-                @Nullable
+        @ToolParam(required = false, description = "Type of followup") @Nullable
                 FollowupType followupType,
         @ToolParam(required = false, description = "Risk level threshold that triggers followup")
                 @Nullable
                 RiskLevel followupRiskThreshold,
-        @ToolParam(required = false, description = "Timeline for followup actions (in days)")
-                @Nullable
+        @ToolParam(required = false, description = "Timeline for followup actions") @Nullable
                 FollowupTimeline followupTimeline,
         @ToolParam(
                         required = false,
-                        description = "Timeline for collecting assessment information (in days)")
+                        description = "Timeline for vendor to complete assessment submission")
                 @Nullable
                 CollectionTimeline collectionTimeline,
         @ToolParam(required = false, description = "Action to take when vendor does not respond")

@@ -2,16 +2,19 @@
 package com.visotrust.viso.visomcpserver.service.intelligencereport;
 
 import com.visotrust.viso.visomcpserver.model.intelligencereport.CreateBitsightReportRequest;
+import com.visotrust.viso.visomcpserver.model.intelligencereport.CreateRecordedFutureReportRequest;
 import com.visotrust.viso.visomcpserver.model.intelligencereport.CreateSecurityScorecardReportRequest;
 import com.visotrust.viso.visomcpserver.model.intelligencereport.ExternalIntelligenceReport;
 import com.visotrust.viso.visomcpserver.model.intelligencereport.IntelligenceProvider;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import jakarta.validation.Valid;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @Service
 public class ExternalIntelligenceReportService {
 
@@ -41,6 +44,17 @@ public class ExternalIntelligenceReportService {
             @Valid CreateSecurityScorecardReportRequest request) {
         return apiService.post(
                 EXTERNAL_INTELLIGENCE_API_PATH + "/security-scorecard",
+                request,
+                ExternalIntelligenceReport.class);
+    }
+
+    @Tool(
+            name = "create_recorded_future_intelligence_report",
+            description = "Create a new Recorded Future intelligence report")
+    public ExternalIntelligenceReport createRecordedFutureIntelligenceReport(
+            @Valid CreateRecordedFutureReportRequest request) {
+        return apiService.post(
+                EXTERNAL_INTELLIGENCE_API_PATH + "/recorded-future",
                 request,
                 ExternalIntelligenceReport.class);
     }

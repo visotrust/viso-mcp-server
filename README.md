@@ -283,33 +283,56 @@ This section provides documentation for the tools exposed by the VISO MCP Server
 
 Returns detailed information about a specific assessment.
 
-#### `create_assessment` - Start an Assessment
-- relationshipId: The ID of the relationship for which to create an assessment (number, required)
-- recipientEmail: The email of the recipient (string, required)
-- recipientFirstName: The first name of the recipient (string, required)
-- recipientLastName: The last name of the recipient (string, required)
-- publicDocumentUrls: URLs of public documents (string[], optional)
-- followupType: The type of followup (string, required)
-- followupRiskThreshold: The risk threshold for followup (string, optional)
-- aiProcessingOnly: Whether to use AI processing only (boolean, optional)
-- files: Files to include with the assessment (byte[][], optional)
-
-Returns the created assessment details.
-
 #### `get_assessment_summary` - Get the summary for an assessment by its ID
 - id: Assessment ID (number, required)
 
 Returns the summary details for a specific assessment.
 
+#### `create_assessment` - Start an assessment for an existing relationship
+- relationshipId: The ID of the relationship for which to create an assessment (number, required)
+- recipientEmail: Email address of the assessment recipient (string, optional)
+- recipientFirstName: First name of the assessment recipient (string, optional)
+- recipientLastName: Last name of the assessment recipient (string, optional)
+- publicDocumentUrls: URLs of public documents to include in the assessment (string[], optional)
+- followupType: Type of follow-up (string enum, optional)
+- followupRiskThreshold: Risk level threshold that triggers follow-up (string enum, optional)
+- followupTimeline: Timeline for follow-up actions (string enum, optional)
+- collectionTimeline: Timeline for vendor to complete assessment submission (string enum, optional)
+- noVendorResponseAction: Action to take when the vendor does not respond (string enum, optional)
+- aiProcessingOnly: Whether to only process using AI without human review (boolean, optional)
+- requestedAuditTypes: Types of audits requested for this assessment (string[], optional)
+
+Returns the created assessment details.
+
+#### `update_assessment_expiration_date` - Update the deadline by which the vendor must submit their assessment response
+- id: Assessment ID (number, required)
+- expirationDate: New expiration date/time, ISO-8601 with offset; must be in the future (string, required)
+
+Returns a confirmation message.
+
+#### `update_assessment_followup` - Update the follow-up configuration for an assessment
+- id: Assessment ID (number, required)
+- followupType: Follow-up type (string enum, required)
+- followupRiskThreshold: Risk threshold at or above which a follow-up assessment should be triggered (string enum, optional)
+- followupTimeline: Follow-up timeline (string enum, optional)
+
+Returns a confirmation message.
+
 ### Audit Logs
 
-#### `get_user_audit_log_events` - Get the audit log events for your organization
-- request: Audit log request parameters (object, required)
-  - startDate: Start date for the audit log events (string, required)
-  - endDate: End date for the audit log events (string, required)
-  - auditLogType: Type of audit log events to retrieve (string, optional)
+#### `get_user_audit_log_events` - Get user-scoped audit log events for your organization
+- start: Start date/time of the query, ISO-8601 with offset (string, required)
+- end: End date/time of the query, ISO-8601 with offset (string, required)
+- eventTypes: Optional set of event types to filter (e.g. `USER_LOGGED_IN`); leave empty for all (string[], optional)
 
 Returns a list of user audit log events, limited to 500 records.
+
+#### `get_audit_log_events` - Get filtered audit log events (user, org, assessment, and relationship events)
+- start: Start date/time of the query, ISO-8601 with offset (string, required)
+- end: End date/time of the query, ISO-8601 with offset (string, required)
+- eventTypes: Optional set of event types to filter (e.g. `ASSESSMENT_COMPLETED`, `RELATIONSHIP_CREATED`); leave empty for all (string[], optional)
+
+Returns polymorphic audit log event records. Each item has at least `auditEventType` and `dateTime`.
 
 ### Business Cases
 
@@ -325,20 +348,12 @@ No parameters required.
 
 Returns a list of all data types available for your organization.
 
-### IQR (Intelligent Query Response)
+### Vendor Directory
 
-#### `ask_trust_center` - Ask questions about your AI Trust Center
-- request: Trust center query parameters (object, required)
-  - query: The question to ask (string, required)
+#### `search_vendor_directory` - Look up a vendor in the VISO TRUST vendor directory by URL or domain
+- urlOrDomain: The URL or domain name to search for, e.g. `example.com` (string, required)
 
-Returns AI-generated responses to questions about your AI Trust Center.
-
-#### `ask_relationship` - Ask questions about a specific relationship
-- request: Relationship query parameters (object, required)
-  - relationshipId: The ID of the relationship to query (number, required)
-  - query: The question to ask (string, required)
-
-Returns AI-generated responses to questions about a specific relationship.
+Returns basic vendor metadata (name, homepage, description, favicon, known domains).
 
 ### Relationships
 
@@ -352,75 +367,91 @@ Returns information about third-party vendors including their assessment status,
 
 Returns detailed information about a third-party vendor including assessment status, risk levels, and contact details.
 
-#### `create_relationship` - Create a new relationship with a third-party vendor
-- request: Relationship creation parameters (object, required)
-  - vendorName: Name of the vendor (string, required)
-  - businessOwnerEmail: Email of the business owner (string, required)
-  - homepage: Vendor's homepage URL (string, optional)
-  - businessContextIds: IDs of business contexts (number[], optional)
-  - dataTypeIds: IDs of data types (number[], optional)
-  - tags: Tags to apply to the relationship (string[], optional)
-
-Returns the created relationship details.
-
-#### `update_relationship` - Update an existing relationship with a third-party vendor
-- request: Relationship update parameters (object, required)
-  - id: Relationship ID (number, required)
-  - vendorName: Name of the vendor (string, optional)
-  - homepage: Vendor's homepage URL (string, optional)
-  - businessContextIds: IDs of business contexts (number[], optional)
-  - dataTypeIds: IDs of data types (number[], optional)
-  - businessOwnerEmail: Email of the business owner (string, optional)
-  - tags: Tags to apply to the relationship (string[], optional)
-
-Returns the updated relationship details.
-
-#### `partially_update_relationship` - Partially update an existing relationship
-- request: Partial relationship update parameters (object, required)
-  - id: Relationship ID (number, required)
-  - [Any fields from update_relationship that need to be changed]
-
-Returns the updated relationship details with only the specified fields changed.
-
-#### `search_relationships` - Search for relationships by domain name or vendor name
-- request: Search parameters (object, required)
-  - query: Search query (string, required)
-
-Returns a list of matching relationships with their assessment details.
-
-#### `create_tags` - Create new tags for categorizing relationships
-- request: Tag creation parameters (object, required)
-  - tags: List of tags to create (string[], required)
-
-Returns a list of all tags including the newly created ones.
-
-#### `update_third_party_contact` - Update the contact details for a third-party vendor
-- request: Contact update parameters (object, required)
-  - relationshipId: Relationship ID (number, required)
-  - email: Contact email (string, required)
-  - firstName: Contact first name (string, required)
-  - lastName: Contact last name (string, required)
-
-Returns the updated relationship details.
-
-#### `get_suggested_contacts` - Get suggested contacts for a relationship
-- relationshipId: Relationship ID (number, required)
-
-Returns a list of potential contacts at the vendor organization.
-
 #### `get_relationship_assessment_history` - Get the assessment history for a relationship
 - id: Relationship ID (number, required)
 
 Returns a list of assessments associated with the specified relationship.
 
-#### `create_relationship_by_domain` - Create a new relationship using only the vendor domain
-- request: Relationship creation parameters (object, required)
-  - domain: Domain of the vendor (string, required, e.g., visotrust.com)
-  - vendorName: Name of the vendor (string, required)
-  - product: Product offered by the vendor (string, optional)
-  - description: Description of the vendor relationship (string, optional)
+#### `create_relationship` - Create a new relationship with a third-party vendor
+- name: Name of the relationship/vendor (string, required)
+- homepage: Homepage URL of the vendor (string, required)
+- businessOwnerEmail: Email address of the business owner (string, required)
+- businessOwnerFirstName: First name of the business owner (string, optional)
+- businessOwnerLastName: Last name of the business owner (string, optional)
+- description: Description of the relationship/vendor (string, optional)
+- contextTypes: List of business context types for this relationship (object[], optional)
+- dataTypes: List of data types handled in this relationship (object[], optional)
+- tags: List of tags to categorize this relationship (string[], optional)
+- thirdPartyContact: Contact details of the third-party vendor representative (object, optional)
 
 Returns the created relationship details.
+
+#### `create_relationship_by_domain` - Create a new relationship using only the vendor domain
+- domain: Domain of the vendor, e.g. `visotrust.com` (string, required)
+- vendorName: Name of the vendor (string, required)
+- product: Product offered by the vendor (string, optional)
+- description: Description of the vendor relationship (string, optional)
+
+Returns the created relationship details.
+
+#### `update_relationship` - Update an existing relationship with a third-party vendor
+- id: Relationship ID (number, required)
+- name: Name of the relationship/vendor (string, required)
+- homepage: Homepage URL of the vendor (string, optional)
+- description: Description of the relationship/vendor (string, optional)
+- contextTypes: List of business context types (object[], optional)
+- dataTypes: List of data types handled in this relationship (object[], optional)
+- businessOwnerEmail: Email address of the business owner (string, optional)
+- businessOwnerFirstName: First name of the business owner (string, optional)
+- businessOwnerLastName: Last name of the business owner (string, optional)
+- tags: List of tags (string[], optional)
+
+Returns the updated relationship details.
+
+#### `partially_update_relationship` - Partially update an existing relationship
+Accepts the same fields as `update_relationship`. Only fields provided in the request are changed; other fields are left untouched.
+
+Returns the updated relationship details.
+
+#### `search_relationships` - Search for relationships by domain name or vendor name
+- domains: List of domain names to search for (string[], required)
+- name: Name of the vendor/relationship to search for (string, required)
+
+Returns a list of matching relationships with their assessment details.
+
+#### `create_tags` - Create new tags for categorizing relationships
+- tags: List of tag names to create (string[], required)
+
+Returns a list of all tags including the newly created ones.
+
+#### `update_third_party_contact` - Update the contact details for a third-party vendor
+- relationshipId: Relationship ID (number, required)
+- email: Contact email (string, required)
+- firstName: Contact first name (string, required)
+- lastName: Contact last name (string, required)
+
+Returns the updated relationship details.
+
+#### `onboard_relationship` - Onboard a relationship, optionally with approval summary and lifecycle management settings
+- id: Relationship ID (number, required)
+- approvalSummary: Optional approval summary recorded at onboarding (string, optional)
+- lifecycleManagementUpdateRequest: Optional lifecycle management settings (object, optional)
+  - artifactUpdateSettings.artifactUpdateType: Artifact update type (string enum)
+  - recertificationSettings.recertificationType: Recertification type (string enum)
+  - recertificationSettings.recertificationDate: Date/time of next recertification, ISO-8601 with offset (string)
+  - recertificationSettings.reviewFrequency: `THREE_YEARS`, `TWO_YEARS`, `ANNUAL`, `SEMIANNUAL`, or `QUARTERLY` (string enum)
+
+Returns the onboarded relationship details.
+
+#### `offboard_relationship` - Offboard a relationship
+- id: Relationship ID (number, required)
+
+Returns the offboarded relationship details.
+
+#### `archive_relationship` - Archive a relationship
+- id: Relationship ID (number, required)
+
+Returns the archived relationship details.
 
 ### Webhooks
 
@@ -487,6 +518,24 @@ Returns the created intelligence report.
 
 Returns the created intelligence report.
 
+#### `create_recorded_future_intelligence_report` - Create a new Recorded Future intelligence report
+- request: Recorded Future report parameters (object, required)
+  - vendorDomain: The vendor's primary domain name (string, required)
+  - reportDate: The date/time the report was generated (ISO 8601 string, required)
+  - entityType: Recorded Future entity type, e.g. `Company` (string, required)
+  - entity: Recorded Future entity identifier (string, required)
+  - riskScore: Numeric risk score (number, required)
+  - riskLevel: Risk level label, e.g. `Critical`/`High`/`Medium`/`Low` (string, required)
+  - link: Optional link to the report in the provider's UI (string, optional)
+  - firstSeen: Earliest observed date for the entity, ISO 8601 (string, optional)
+  - lastSeen: Most recent observed date for the entity, ISO 8601 (string, optional)
+  - triggeredRuleCount: Number of Recorded Future rules that have triggered (number, optional)
+  - maxRuleCount: Maximum number of Recorded Future rules evaluated (number, optional)
+  - summary: Optional summary text from Recorded Future (string, optional)
+  - criticalityLabel: Recorded Future criticality label for the entity (string, optional)
+
+Returns the created intelligence report.
+
 #### `get_intelligence_reports_by_vendor` - Get all intelligence reports for a vendor
 - vendorDomain: The vendor's primary domain name (string, required)
 
@@ -494,7 +543,7 @@ Returns a list of intelligence reports for the specified vendor.
 
 #### `get_latest_intelligence_report` - Get the latest intelligence report for a vendor from a specific source
 - vendorDomain: The vendor's primary domain name (string, required)
-- source: Intelligence provider (string enum: BITSIGHT or SECURITY_SCORECARD, required)
+- source: Intelligence provider (string enum: `BITSIGHT`, `SECURITY_SCORECARD`, or `RECORDED_FUTURE`, required)
 
 Returns the latest intelligence report for the specified vendor and source.
 
