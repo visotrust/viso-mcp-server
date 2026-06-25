@@ -7,5 +7,6 @@ public enum RecommendationType {
     CONTROL_DOMAINS,
     COMBINED,
     CERT_ONLY,
-    LOW_COVERAGE
+    LOW_COVERAGE,
+    PRESUMED_ARTIFACT
 }

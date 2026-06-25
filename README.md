@@ -2,6 +2,35 @@
 
 A Model Context Protocol (MCP) server for integrating VISO TRUST API capabilities with AI assistants.
 
+## Hosted Remote Server
+
+VISO TRUST hosts a managed instance of this MCP server, so you don't need to build, run, or self-host anything to get started:
+
+```
+https://mcp.visotrust.com/mcp
+```
+
+Connect any MCP client to this endpoint using the **Streamable HTTP** transport and authenticate with your VISO TRUST API token. For information on how to generate an API token, see the [VISO TRUST support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
+
+Example client configuration:
+```json
+{
+    "mcpServers": {
+        "viso-mcp": {
+            "type": "streamable-http",
+            "url": "https://mcp.visotrust.com/mcp",
+            "headers": {
+                "Authorization": "Bearer <your-api-token>"
+            }
+        }
+    }
+}
+```
+
+To test the hosted endpoint with MCP Inspector, run `npx @modelcontextprotocol/inspector`, set **Transport Type** to **Streamable HTTP**, and use the URL above.
+
+The remainder of this document covers running the server yourself (locally or in your own infrastructure).
+
 ## Requirements
 
 - Java 21+
@@ -28,12 +57,15 @@ This application supports Spring Boot profiles to enable different configuration
 
 #### Remote Profile
 
-The `remote` profile is specifically designed for **remote MCP support using Server-Sent Events (SSE)**. This profile configures the application to work optimally in distributed environments where the MCP server needs to communicate with remote clients over HTTP/SSE connections.
+The `remote` profile is designed for **remote MCP support over the Streamable HTTP transport**. This profile runs the server as a web application so it can communicate with remote clients over HTTP. (Streamable HTTP is the Spring AI 2.0 default and replaces the deprecated SSE transport.)
 
 **Key differences in the remote profile:**
-- Configured for SSE-based communication instead of standard I/O
+- Runs as a servlet web application (Tomcat) on port `3001` instead of standard I/O
+- Exposes the MCP endpoint at `POST /mcp` (Streamable HTTP)
 - Optimized server settings for remote client connections
 - Enhanced logging for distributed debugging
+
+> **Note:** Clients connect to the single Streamable HTTP endpoint `…/mcp`. The legacy SSE endpoints (`/sse` + `/mcp/message`) are no longer served.
 
 **How to activate the remote profile:**
 
@@ -57,9 +89,9 @@ docker run -i --rm \
 
 **When to use the remote profile:**
 - When deploying the MCP server to a remote server or cloud environment
-- When clients will connect via HTTP/SSE rather than direct stdio
+- When clients will connect via Streamable HTTP rather than direct stdio
 - When you need enhanced logging and monitoring for distributed deployments
-- When integrating with web-based AI assistants that require SSE communication
+- When integrating with web-based AI assistants that connect over Streamable HTTP
 
 For local development and direct stdio communication, use the default profile (no profile specification needed).
 
