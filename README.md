@@ -28,12 +28,15 @@ This application supports Spring Boot profiles to enable different configuration
 
 #### Remote Profile
 
-The `remote` profile is specifically designed for **remote MCP support using Server-Sent Events (SSE)**. This profile configures the application to work optimally in distributed environments where the MCP server needs to communicate with remote clients over HTTP/SSE connections.
+The `remote` profile is designed for **remote MCP support over the Streamable HTTP transport**. This profile runs the server as a web application so it can communicate with remote clients over HTTP. (Streamable HTTP is the Spring AI 2.0 default and replaces the deprecated SSE transport.)
 
 **Key differences in the remote profile:**
-- Configured for SSE-based communication instead of standard I/O
+- Runs as a servlet web application (Tomcat) on port `3001` instead of standard I/O
+- Exposes the MCP endpoint at `POST /mcp` (Streamable HTTP)
 - Optimized server settings for remote client connections
 - Enhanced logging for distributed debugging
+
+> **Note:** Clients connect to the single Streamable HTTP endpoint `…/mcp`. The legacy SSE endpoints (`/sse` + `/mcp/message`) are no longer served.
 
 **How to activate the remote profile:**
 
@@ -57,9 +60,9 @@ docker run -i --rm \
 
 **When to use the remote profile:**
 - When deploying the MCP server to a remote server or cloud environment
-- When clients will connect via HTTP/SSE rather than direct stdio
+- When clients will connect via Streamable HTTP rather than direct stdio
 - When you need enhanced logging and monitoring for distributed deployments
-- When integrating with web-based AI assistants that require SSE communication
+- When integrating with web-based AI assistants that connect over Streamable HTTP
 
 For local development and direct stdio communication, use the default profile (no profile specification needed).
 
