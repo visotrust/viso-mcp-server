@@ -18,6 +18,7 @@ public enum ComplianceStandard {
     ISO27701,
     ISO21434,
     ISO22301,
+    ISO42001,
 
     ISOIEC_2700127002,
     ISOIEC_2701727002,

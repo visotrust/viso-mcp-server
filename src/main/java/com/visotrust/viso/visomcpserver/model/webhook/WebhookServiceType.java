@@ -5,5 +5,6 @@ public enum WebhookServiceType {
     GENERIC,
     SLACK,
     DISCORD,
-    TEAMS
+    TEAMS,
+    WORKATO
 }

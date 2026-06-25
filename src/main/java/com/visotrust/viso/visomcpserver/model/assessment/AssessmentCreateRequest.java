@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 public record AssessmentCreateRequest(
@@ -53,4 +54,10 @@ public record AssessmentCreateRequest(
                         required = false,
                         description = "Types of audits being requested for this assessment")
                 @Nullable
-                Set<AuditReportType> requestedAuditTypes) {}
+                Set<AuditReportType> requestedAuditTypes,
+        @ToolParam(
+                        required = false,
+                        description =
+                                "IDs of questionnaires (UUIDs) to answer for this assessment. Use get_all_questionnaires or get_relationship_questionnaires to find IDs. Questionnaires marked aiOnly are answered by AI by default; pass their ID here to instead send them to the vendor for manual response.")
+                @Nullable
+                List<UUID> questionnaires) {}
