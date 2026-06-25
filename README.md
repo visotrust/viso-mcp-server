@@ -2,6 +2,35 @@
 
 A Model Context Protocol (MCP) server for integrating VISO TRUST API capabilities with AI assistants.
 
+## Hosted Remote Server
+
+VISO TRUST hosts a managed instance of this MCP server, so you don't need to build, run, or self-host anything to get started:
+
+```
+https://mcp.visotrust.com/mcp
+```
+
+Connect any MCP client to this endpoint using the **Streamable HTTP** transport and authenticate with your VISO TRUST API token. For information on how to generate an API token, see the [VISO TRUST support documentation](https://support.visotrust.com/article/olo26aapun-generateaccesstoken).
+
+Example client configuration:
+```json
+{
+    "mcpServers": {
+        "viso-mcp": {
+            "type": "streamable-http",
+            "url": "https://mcp.visotrust.com/mcp",
+            "headers": {
+                "Authorization": "Bearer <your-api-token>"
+            }
+        }
+    }
+}
+```
+
+To test the hosted endpoint with MCP Inspector, run `npx @modelcontextprotocol/inspector`, set **Transport Type** to **Streamable HTTP**, and use the URL above.
+
+The remainder of this document covers running the server yourself (locally or in your own infrastructure).
+
 ## Requirements
 
 - Java 21+
