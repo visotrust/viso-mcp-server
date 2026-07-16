@@ -57,15 +57,18 @@ This application supports Spring Boot profiles to enable different configuration
 
 #### Remote Profile
 
-The `remote` profile is designed for **remote MCP support over the Streamable HTTP transport**. This profile runs the server as a web application so it can communicate with remote clients over HTTP. (Streamable HTTP is the Spring AI 2.0 default and replaces the deprecated SSE transport.)
+The `remote` profile is designed for **remote MCP support over the Streamable HTTP transport**. This profile runs the server as a web application so it can communicate with remote clients over HTTP. (Streamable HTTP replaces the deprecated SSE transport in Spring AI 2.0.)
 
 **Key differences in the remote profile:**
 - Runs as a servlet web application (Tomcat) on port `3001` instead of standard I/O
 - Exposes the MCP endpoint at `POST /mcp` (Streamable HTTP)
+- Runs the transport in **stateless** mode (`spring.ai.mcp.server.protocol=STATELESS`)
 - Optimized server settings for remote client connections
 - Enhanced logging for distributed debugging
 
 > **Note:** Clients connect to the single Streamable HTTP endpoint `…/mcp`. The legacy SSE endpoints (`/sse` + `/mcp/message`) are no longer served.
+
+> **Stateless transport & horizontal scaling:** The remote profile uses the stateless Streamable HTTP variant, so the server does not issue a per-connection `Mcp-Session-Id` or keep session state in memory. This lets the endpoint run behind a load balancer across multiple replicas **without session affinity (sticky sessions)** — any replica can serve any request. The stateful `STREAMABLE` mode, by contrast, holds session state in a single replica's memory and would require sticky sessions keyed on the `Mcp-Session-Id` header to avoid intermittent `404 session not found` errors when scaled horizontally. Client configuration is identical either way — the transport type is still **Streamable HTTP**.
 
 **How to activate the remote profile:**
 
