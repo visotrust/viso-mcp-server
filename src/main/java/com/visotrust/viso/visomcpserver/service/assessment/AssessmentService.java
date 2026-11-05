@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
+import com.visotrust.viso.visomcpserver.model.assessment.SummaryFormat;
 import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentExpirationInput;
 import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentFollowupInput;
+import com.visotrust.viso.visomcpserver.model.assessment.UpdateAssessmentSummaryInput;
 import com.visotrust.viso.visomcpserver.service.ApiService;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -44,12 +47,57 @@ public class AssessmentService {
 
     @Tool(
             name = "get_assessment_summary",
-            description = "Get the summary for an assessment by its ID")
+            description =
+                    "Get the summary for an assessment by its ID, as HTML (default) or Markdown. "
+                            + "The returned version can be passed to update_assessment_summary to avoid overwriting a newer edit.")
     public AssessmentSummary getAssessmentSummary(
             @ToolParam(description = "The unique ID of the assessment to get the details for")
-                    Long id) {
-        return apiService.get(
-                String.format("%s/%d/summary", ASSESSMENTS_API_PATH, id), AssessmentSummary.class);
+                    Long id,
+            @ToolParam(
+                            required = false,
+                            description =
+                                    "Format to return the summary in: HTML (default) or MARKDOWN")
+                    @Nullable
+                    SummaryFormat format) {
+        String path = String.format("%s/%d/summary", ASSESSMENTS_API_PATH, id);
+        if (format != null) {
+            path += "?format=" + format.parameter();
+        }
+        return apiService.get(path, AssessmentSummary.class);
+    }
+
+    @Tool(
+            name = "update_assessment_summary",
+            description =
+                    "Replace the text of a completed assessment's AI-generated summary. The edit is shown in place of "
+                            + "the generated summary and is discarded when the summary is regenerated after a new assessment "
+                            + "completes. Unsupported markup is removed; images must be embedded as data: URIs. "
+                            + "Returns the updated summary in the format it was sent in.")
+    public AssessmentSummary updateAssessmentSummary(
+            @ToolParam(description = "The unique ID of the assessment") Long id,
+            @ToolParam(description = "The edited summary, written in the given format")
+                    String summary,
+            @ToolParam(
+                            required = false,
+                            description =
+                                    "Format the summary is written in: HTML (default) or MARKDOWN. "
+                                            + "Markdown is rendered with the report's own styling.")
+                    @Nullable
+                    SummaryFormat format,
+            @ToolParam(
+                            required = false,
+                            description =
+                                    "The version returned by get_assessment_summary. When given, the update is "
+                                            + "rejected if the summary has changed since it was read.")
+                    @Nullable
+                    String version) {
+        UpdateAssessmentSummaryInput body =
+                new UpdateAssessmentSummaryInput(
+                        summary, format == null ? null : format.parameter(), version);
+        return apiService.put(
+                String.format("%s/%d/summary", ASSESSMENTS_API_PATH, id),
+                body,
+                AssessmentSummary.class);
     }
 
     @Tool(name = "get_assessment", description = "Get an assessment by its ID")
