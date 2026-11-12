@@ -9,10 +9,10 @@ import com.visotrust.viso.visomcpserver.model.relationship.*;
 import com.visotrust.viso.visomcpserver.service.ApiService;
 import jakarta.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -143,37 +143,17 @@ public class RelationshipService {
         ResponseEntity<List<Relationship>> response =
                 apiService.postForEntity(
                         uri.build().toUriString(),
-                        request == null ? emptySearchInput() : request,
+                        request == null ? Map.of() : request,
                         new ParameterizedTypeReference<>() {});
-        List<Relationship> relationships =
-                response.getBody() == null ? List.of() : response.getBody();
+        List<Relationship> relationships = response.getBody();
+        long totalCount = Long.parseLong(response.getHeaders().getFirst(TOTAL_COUNT_HEADER));
         long offset = (long) pageNumber * pageSize;
-        long totalCount = totalCount(response.getHeaders(), offset + relationships.size());
         return new RelationshipSearchResult(
                 totalCount,
                 pageNumber,
                 pageSize,
                 offset + relationships.size() < totalCount,
                 relationships);
-    }
-
-    private static RelationshipSearchInput emptySearchInput() {
-        return new RelationshipSearchInput(
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null);
-    }
-
-    /** Total matches from the X-Total-Count header, or {@code fallback} when it is absent. */
-    static long totalCount(HttpHeaders headers, long fallback) {
-        String value = headers.getFirst(TOTAL_COUNT_HEADER);
-        if (!StringUtils.hasText(value)) {
-            return fallback;
-        }
-        try {
-            return Long.parseLong(value.trim());
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
     }
 
     @Tool(

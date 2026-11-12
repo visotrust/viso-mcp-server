@@ -153,7 +153,8 @@ public class ExternalIntelligenceReportService {
             name = "bulk_create_bitsight_intelligence_reports",
             description =
                     "Create up to 1000 BitSight intelligence reports in one call. Large batches may be created in the "
-                            + "background: created lists the ids made immediately and backgroundedCount the rest.")
+                            + "background: created lists the ids made immediately, "
+                            + "backgroundedCount the reports still queued, and totalFailureCount the reports that failed.")
     public BulkIntelligenceReportResult bulkCreateBitsightIntelligenceReports(
             @ToolParam(description = "The reports to create (1 to 1000)") @Valid
                     List<CreateBitsightReportRequest> reports) {
@@ -167,7 +168,8 @@ public class ExternalIntelligenceReportService {
             name = "bulk_create_security_scorecard_intelligence_reports",
             description =
                     "Create up to 1000 SecurityScorecard intelligence reports in one call. Large batches may be created "
-                            + "in the background: created lists the ids made immediately and backgroundedCount the rest.")
+                            + "in the background: created lists the ids made immediately, "
+                            + "backgroundedCount the reports still queued, and totalFailureCount the reports that failed.")
     public BulkIntelligenceReportResult bulkCreateSecurityScorecardIntelligenceReports(
             @ToolParam(description = "The reports to create (1 to 1000)") @Valid
                     List<CreateSecurityScorecardReportRequest> reports) {
@@ -181,7 +183,8 @@ public class ExternalIntelligenceReportService {
             name = "bulk_create_recorded_future_intelligence_reports",
             description =
                     "Create up to 1000 Recorded Future intelligence reports in one call. Large batches may be created "
-                            + "in the background: created lists the ids made immediately and backgroundedCount the rest.")
+                            + "in the background: created lists the ids made immediately, "
+                            + "backgroundedCount the reports still queued, and totalFailureCount the reports that failed.")
     public BulkIntelligenceReportResult bulkCreateRecordedFutureIntelligenceReports(
             @ToolParam(description = "The reports to create (1 to 1000)") @Valid
                     List<CreateRecordedFutureReportRequest> reports) {

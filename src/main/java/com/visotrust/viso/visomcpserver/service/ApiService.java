@@ -93,11 +93,7 @@ public class ApiService {
     }
 
     public <T, R> R post(String path, T request, ParameterizedTypeReference<R> responseType) {
-        HttpHeaders headers = createHeaders();
-        HttpEntity<T> entity = new HttpEntity<>(request, headers);
-        ResponseEntity<R> response =
-                restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, responseType);
-        return response.getBody();
+        return postForEntity(path, request, responseType).getBody();
     }
 
     /** POST returning the full response, for endpoints that report paging in headers. */

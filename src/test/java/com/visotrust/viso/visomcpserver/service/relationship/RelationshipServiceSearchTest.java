@@ -13,9 +13,9 @@ import com.visotrust.viso.visomcpserver.model.relationship.RelationshipSearchInp
 import com.visotrust.viso.visomcpserver.model.relationship.RelationshipSearchResult;
 import com.visotrust.viso.visomcpserver.service.ApiService;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -77,19 +77,15 @@ class RelationshipServiceSearchTest {
 
     @Test
     void nullRequestSendsEmptyFilters() {
-        stubResponse(List.of(), null);
-        ArgumentCaptor<RelationshipSearchInput> body =
-                ArgumentCaptor.forClass(RelationshipSearchInput.class);
+        stubResponse(List.of(), "0");
 
         RelationshipSearchResult result = service.searchRelationships(null, null, null, null);
 
         verify(apiService)
                 .postForEntity(
                         eq("/api/v1/relationships/search?page=0&size=100"),
-                        body.capture(),
+                        eq(Map.of()),
                         any(ParameterizedTypeReference.class));
-        assertThat(body.getValue()).isNotNull();
-        assertThat(body.getValue().tags()).isNull();
         assertThat(result.totalCount()).isZero();
         assertThat(result.hasMore()).isFalse();
     }
@@ -97,9 +93,7 @@ class RelationshipServiceSearchTest {
     @SuppressWarnings("unchecked")
     private void stubResponse(List<Relationship> body, String totalCount) {
         HttpHeaders headers = new HttpHeaders();
-        if (totalCount != null) {
-            headers.add("X-Total-Count", totalCount);
-        }
+        headers.add("X-Total-Count", totalCount);
         when(apiService.postForEntity(any(), any(), any(ParameterizedTypeReference.class)))
                 .thenReturn(new ResponseEntity<>(body, headers, HttpStatus.OK));
     }
