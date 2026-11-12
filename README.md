@@ -318,8 +318,17 @@ Returns detailed information about a specific assessment.
 
 #### `get_assessment_summary` - Get the summary for an assessment by its ID
 - id: Assessment ID (number, required)
+- format: `HTML` (default) or `MARKDOWN` (string, optional)
 
-Returns the summary details for a specific assessment.
+Returns the summary, its `version`, and whether it has been `edited`.
+
+#### `update_assessment_summary` - Replace the text of a completed assessment's AI-generated summary
+- id: Assessment ID (number, required)
+- summary: The edited summary (string, required)
+- format: `HTML` (default) or `MARKDOWN` (string, optional)
+- version: The `version` from `get_assessment_summary`; the update is rejected if the summary changed since (string, optional)
+
+Returns the updated summary in the format it was sent in.
 
 #### `create_assessment` - Start an assessment for an existing relationship
 - relationshipId: The ID of the relationship for which to create an assessment (number, required)
@@ -366,6 +375,12 @@ Returns a list of user audit log events, limited to 500 records.
 - eventTypes: Optional set of event types to filter (e.g. `ASSESSMENT_COMPLETED`, `RELATIONSHIP_CREATED`); leave empty for all (string[], optional)
 
 Returns polymorphic audit log event records. Each item has at least `auditEventType` and `dateTime`.
+
+### Business Units
+
+#### `get_all_business_units` - Get all business units for your organization, sorted by name
+
+Returns each business unit's `id` (usable as a `businessUnitIds` filter in `search_relationships`) and `name` (usable as `businessUnit` in `create_user`).
 
 ### Business Cases
 
@@ -446,11 +461,26 @@ Accepts the same fields as `update_relationship`. Only fields provided in the re
 
 Returns the updated relationship details.
 
-#### `search_relationships` - Search for relationships by domain name or vendor name
-- domains: List of domain names to search for (string[], required)
-- name: Name of the vendor/relationship to search for (string, required)
+#### `search_relationships` - Search for relationships by filter criteria
+Calls `POST /api/v1/relationships/search`. Every filter is optional; filters combine with AND, and values within one list filter combine with OR.
+- request: Search filters (object, optional)
+  - tags: Tag names, exactly as they appear in VISO TRUST (string[], optional)
+  - domains: Vendor domain names, e.g. `example.com` (string[], optional)
+  - name: Exact relationship name (string, optional)
+  - externalId: Exact external id (string, optional)
+  - statuses: Relationship statuses — `NOT_ONBOARDED`, `ONBOARDED`, `ARCHIVED` (string[], optional)
+  - assessmentStatuses: Latest assessment statuses (string[], optional)
+  - riskAcceptanceStatuses: `RISK_ACCEPTED`, `REVIEW_NEEDED`, `REMEDIATION_REQUESTED` (string[], optional)
+  - inherentRiskLevels / residualRiskLevels: `NO_CONTEXT`, `LOW`, `MEDIUM`, `HIGH`, `EXTREME` (string[], optional)
+  - minScore / maxScore: Score range, inclusive (number, optional)
+  - businessUnitIds: Business unit ids from `get_all_business_units` (number[], optional)
+  - businessOwnerIds / creatorIds: User ids from `get_all_users` (number[], optional)
+  - createdAfter / createdBefore, onboardedAfter / onboardedBefore, recertificationAfter / recertificationBefore, assessmentCompletedAfter / assessmentCompletedBefore: ISO-8601 date-times (string, optional)
+- page: Zero-based page number (number, optional, default 0)
+- size: Page size (number, optional, default 100, max 500)
+- sort: Sort orders as `property,asc|desc`; properties `name`, `externalId`, `score`, `createdDate`, `onboardedDate`, `recertificationDate` (string[], optional)
 
-Returns a list of matching relationships with their assessment details.
+Returns `totalCount`, `page`, `size`, `hasMore` and the page of matching `relationships`.
 
 #### `create_tags` - Create new tags for categorizing relationships
 - tags: List of tag names to create (string[], required)
@@ -480,6 +510,28 @@ Returns the onboarded relationship details.
 - id: Relationship ID (number, required)
 
 Returns the offboarded relationship details.
+
+#### `accept_relationship_risk` - Accept the risk of a relationship
+- id: Relationship ID (number, required)
+- request: (object, optional)
+  - riskReviewNote: Note explaining the decision (string, optional)
+  - inherentRiskOverride / residualRiskOverride: `LOW`, `MEDIUM`, `HIGH` or `EXTREME`; give both or neither (string, optional)
+
+Returns the updated relationship.
+
+#### `get_relationship_detections` - Get the detections found in a relationship's evidence
+- id: Relationship ID (number, required)
+- detectionTypes: `NORMAL`, `SUBSERVICE`, `SHARED_RESPONSIBILITY_MODEL`, `EXCEPTION`, `CUEC`, `SUBPROCESSOR`; defaults to all but `NORMAL` (string[], optional)
+- controlDomainTypes: Control domain types to include; defaults to all (string[], optional)
+- assessmentId: A completed assessment of this relationship, or its in-progress latest assessment (number, optional)
+- includeQuestionnaireAnswers: Include the answers behind supplemental questionnaire detections (boolean, optional)
+- afterId: The previous page's `nextAfterId` (number, optional)
+- size: Detections per page, 1 to 500 (number, optional, default 100)
+
+Returns one page of detections; read on while `nextAfterId` is not null.
+
+#### `get_risk_advisories_by_relationship` - Get risk advisories for a relationship's vendor
+- id: Relationship ID (number, required)
 
 #### `archive_relationship` - Archive a relationship
 - id: Relationship ID (number, required)
@@ -574,11 +626,33 @@ Returns the created intelligence report.
 
 Returns a list of intelligence reports for the specified vendor.
 
+#### `get_intelligence_report` - Get an intelligence report by ID
+- id: Report ID (UUID, required)
+
+#### `update_bitsight_intelligence_report`, `update_security_scorecard_intelligence_report`, `update_recorded_future_intelligence_report` - Replace an existing intelligence report
+- id: Report ID (UUID, required)
+- request: Same fields as the matching `create_*_intelligence_report` tool. Optional fields left out are cleared.
+
+#### `delete_intelligence_report` - Permanently delete an intelligence report
+- id: Report ID (UUID, required)
+
+#### `bulk_create_bitsight_intelligence_reports`, `bulk_create_security_scorecard_intelligence_reports`, `bulk_create_recorded_future_intelligence_reports` - Create up to 1000 intelligence reports at once
+- reports: Same fields as the matching `create_*_intelligence_report` tool (object[], required)
+
+Returns `totalCount`, the `created` report IDs, and `backgroundedCount` for reports queued to be created in the background.
+
 #### `get_latest_intelligence_report` - Get the latest intelligence report for a vendor from a specific source
 - vendorDomain: The vendor's primary domain name (string, required)
 - source: Intelligence provider (string enum: `BITSIGHT`, `SECURITY_SCORECARD`, or `RECORDED_FUTURE`, required)
 
 Returns the latest intelligence report for the specified vendor and source.
+
+### Risk Advisories
+
+#### `get_risk_advisories_by_vendor` - Get all risk advisories for a vendor
+- vendorId: Vendor ID (number, required)
+
+Returns security, compliance, vulnerability, legal, geopolitical, financial and operational advisories published for the vendor.
 
 ### Users
 
