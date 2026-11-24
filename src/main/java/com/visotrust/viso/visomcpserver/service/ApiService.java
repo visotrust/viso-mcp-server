@@ -9,10 +9,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -102,6 +104,15 @@ public class ApiService {
         HttpHeaders headers = createHeaders();
         HttpEntity<T> entity = new HttpEntity<>(request, headers);
         return restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, responseType);
+    }
+
+    public <R> R postMultipart(String path, MultiValueMap<String, ?> parts, Class<R> responseType) {
+        HttpHeaders headers = createHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, ?>> entity = new HttpEntity<>(parts, headers);
+        ResponseEntity<R> response =
+                restTemplate.exchange(baseUrl + path, HttpMethod.POST, entity, responseType);
+        return response.getBody();
     }
 
     public <T, R> R put(String path, T request, Class<R> responseType) {
