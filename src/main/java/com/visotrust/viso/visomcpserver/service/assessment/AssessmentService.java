@@ -1,7 +1,6 @@
 /* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.service.assessment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.visotrust.viso.visomcpserver.model.assessment.Assessment;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentCreateRequest;
 import com.visotrust.viso.visomcpserver.model.assessment.AssessmentSummary;
@@ -23,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 @Validated
 @Service
@@ -31,17 +31,17 @@ public class AssessmentService {
     private static final String ASSESSMENTS_API_PATH = "/api/v1/assessments";
     private final ApiService apiService;
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final String baseUrl;
 
     public AssessmentService(
             ApiService apiService,
             RestTemplate restTemplate,
-            ObjectMapper objectMapper,
+            JsonMapper jsonMapper,
             @Value("${visotrust.api.base-url}") String baseUrl) {
         this.apiService = apiService;
         this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.baseUrl = baseUrl;
     }
 
@@ -120,7 +120,7 @@ public class AssessmentService {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
             // Add the request part
-            body.add("request", objectMapper.writeValueAsString(request));
+            body.add("request", jsonMapper.writeValueAsString(request));
 
             // Create the request entity
             HttpEntity<MultiValueMap<String, Object>> requestEntity =

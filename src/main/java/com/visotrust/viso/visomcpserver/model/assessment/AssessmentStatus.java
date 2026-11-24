@@ -10,5 +10,6 @@ public enum AssessmentStatus {
     COMPLETED,
     CANCELLED,
     DELETED,
-    COLLECTING_INFORMATION
+    COLLECTING_INFORMATION,
+    EXPIRED
 }

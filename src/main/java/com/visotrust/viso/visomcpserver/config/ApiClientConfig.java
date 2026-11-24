@@ -10,7 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 public class ApiClientConfig {
@@ -23,6 +27,12 @@ public class ApiClientConfig {
 
     @Bean
     public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate(messageConverters());
+        restTemplate.setRequestFactory(requestFactory());
+        return restTemplate;
+    }
+
+    private HttpComponentsClientHttpRequestFactory requestFactory() {
         RequestConfig requestConfig =
                 RequestConfig.custom()
                         .setConnectTimeout(Timeout.of(connectTimeout, TimeUnit.MILLISECONDS))
@@ -32,9 +42,17 @@ public class ApiClientConfig {
         CloseableHttpClient httpClient =
                 HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 
-        HttpComponentsClientHttpRequestFactory requestFactory =
-                new HttpComponentsClientHttpRequestFactory(httpClient);
+        return new HttpComponentsClientHttpRequestFactory(httpClient);
+    }
 
-        return new RestTemplate(requestFactory);
+    // The Client API keeps adding enum values; one unknown value must not fail a whole response.
+    private static HttpMessageConverters messageConverters() {
+        JsonMapper.Builder lenientEnumMapperBuilder =
+                JsonMapper.builder().enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
+
+        return HttpMessageConverters.forClient()
+                .registerDefaults()
+                .withJsonConverter(new JacksonJsonHttpMessageConverter(lenientEnumMapperBuilder))
+                .build();
     }
 }
