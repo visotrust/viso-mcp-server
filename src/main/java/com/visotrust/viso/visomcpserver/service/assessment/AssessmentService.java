@@ -13,16 +13,10 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestTemplate;
-import tools.jackson.databind.json.JsonMapper;
 
 @Validated
 @Service
@@ -30,19 +24,9 @@ public class AssessmentService {
 
     private static final String ASSESSMENTS_API_PATH = "/api/v1/assessments";
     private final ApiService apiService;
-    private final RestTemplate restTemplate;
-    private final JsonMapper jsonMapper;
-    private final String baseUrl;
 
-    public AssessmentService(
-            ApiService apiService,
-            RestTemplate restTemplate,
-            JsonMapper jsonMapper,
-            @Value("${visotrust.api.base-url}") String baseUrl) {
+    public AssessmentService(ApiService apiService) {
         this.apiService = apiService;
-        this.restTemplate = restTemplate;
-        this.jsonMapper = jsonMapper;
-        this.baseUrl = baseUrl;
     }
 
     @Tool(
@@ -111,27 +95,9 @@ public class AssessmentService {
             name = "create_assessment",
             description = "Start an Assessment for an existing relationship")
     public Assessment createAssessment(@Valid AssessmentCreateRequest request) {
-        try {
-            // Create headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            // Create multipart request body
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-            // Add the request part
-            body.add("request", jsonMapper.writeValueAsString(request));
-
-            // Create the request entity
-            HttpEntity<MultiValueMap<String, Object>> requestEntity =
-                    new HttpEntity<>(body, headers);
-
-            // Send the request
-            return restTemplate.postForObject(
-                    baseUrl + ASSESSMENTS_API_PATH, requestEntity, Assessment.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create assessment", e);
-        }
+        MultipartBodyBuilder parts = new MultipartBodyBuilder();
+        parts.part("request", request, MediaType.APPLICATION_JSON);
+        return apiService.postMultipart(ASSESSMENTS_API_PATH, parts.build(), Assessment.class);
     }
 
     @Tool(
