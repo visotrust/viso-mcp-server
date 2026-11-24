@@ -34,10 +34,7 @@ class ApiClientConfigTest {
                   "id": 1,
                   "name": "Acme",
                   "status": "ONBOARDED",
-                  "isTransitional": false,
                   "latestAssessment": {
-                    "aiProcessingOnly": false,
-                    "requestedArtifactCollection": false,
                     "status": "STATUS_ADDED_LATER",
                     "statusHistories": [
                       {"status": "COMPLETED"},
@@ -70,12 +67,25 @@ class ApiClientConfigTest {
     void ignoresPropertiesTheModelsDoNotDeclare() {
         respondWith(
                 """
-                {"id": 1, "name": "Acme", "isTransitional": false, "fieldAddedLater": {"nested": true}}
+                {"id": 1, "name": "Acme", "fieldAddedLater": {"nested": true}}
                 """);
 
         Relationship relationship = restTemplate.getForObject(RELATIONSHIP_URL, Relationship.class);
 
         assertThat(relationship.id()).isEqualTo(1L);
+    }
+
+    @Test
+    void readsMissingOrNullPrimitivesAsDefaults() {
+        respondWith(
+                """
+                {"id": 1, "name": "Acme", "isTransitional": null, "latestAssessment": {}}
+                """);
+
+        Relationship relationship = restTemplate.getForObject(RELATIONSHIP_URL, Relationship.class);
+
+        assertThat(relationship.isTransitional()).isFalse();
+        assertThat(relationship.latestAssessment().aiProcessingOnly()).isFalse();
     }
 
     private void respondWith(String json) {

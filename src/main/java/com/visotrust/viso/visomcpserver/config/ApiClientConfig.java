@@ -13,6 +13,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -45,14 +46,16 @@ public class ApiClientConfig {
         return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
 
-    // The Client API keeps adding enum values; one unknown value must not fail a whole response.
+    // The Client API evolves; a new enum value or dropped field must not fail a whole response.
     private static HttpMessageConverters messageConverters() {
-        JsonMapper.Builder lenientEnumMapperBuilder =
-                JsonMapper.builder().enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
+        JsonMapper.Builder lenientMapperBuilder =
+                JsonMapper.builder()
+                        .enable(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL)
+                        .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
 
         return HttpMessageConverters.forClient()
                 .registerDefaults()
-                .withJsonConverter(new JacksonJsonHttpMessageConverter(lenientEnumMapperBuilder))
+                .withJsonConverter(new JacksonJsonHttpMessageConverter(lenientMapperBuilder))
                 .build();
     }
 }
