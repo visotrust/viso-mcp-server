@@ -8,5 +8,5 @@ public enum RecommendationType {
     COMBINED,
     CERT_ONLY,
     LOW_COVERAGE,
-    PRESUMED_ARTIFACT
+    COMPLIANCE_ATTESTATION
 }

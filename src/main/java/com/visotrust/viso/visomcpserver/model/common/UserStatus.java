@@ -3,7 +3,5 @@ package com.visotrust.viso.visomcpserver.model.common;
 
 public enum UserStatus {
     ACTIVE,
-    INACTIVE,
-    INVITED,
-    SUSPENDED
+    INACTIVE
 }

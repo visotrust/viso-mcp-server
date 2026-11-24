@@ -26,8 +26,7 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.ai:spring-ai-starter-mcp-server-webmvc'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'tools.jackson.core:jackson-databind'
     implementation 'org.apache.httpcomponents.client5:httpclient5'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'

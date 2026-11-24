@@ -1,7 +1,6 @@
 /* Copyright (c) 2025 VISO TRUST */
 package com.visotrust.viso.visomcpserver.service.auditlog;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.visotrust.viso.visomcpserver.model.auditlog.AuditLogRequest;
 import com.visotrust.viso.visomcpserver.model.auditlog.UserEvent;
 import com.visotrust.viso.visomcpserver.service.ApiService;
@@ -9,6 +8,7 @@ import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.JsonNode;
 
 @Service
 public class AuditLogService {
